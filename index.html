@@ -1692,11 +1692,153 @@ function clearAll(){
 /* ============================================================
    SPEECH
    ============================================================ */
+/* ============================================================
+   WEB AUDIO — UI SOUNDS
+   ============================================================ */
+let _ac = null;
+function getAC(){
+  if(!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)();
+  if(_ac.state === 'suspended') _ac.resume();
+  return _ac;
+}
+
+// Generic click tick
+function playClick(){
+  try{
+    const ac = getAC();
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(880, ac.currentTime);
+    o.frequency.exponentialRampToValueAtTime(660, ac.currentTime + 0.06);
+    g.gain.setValueAtTime(0.18, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.08);
+    o.start(); o.stop(ac.currentTime + 0.09);
+  }catch(e){}
+}
+
+// Correct answer — happy ascending chime
+function playCorrect(){
+  try{
+    const ac = getAC();
+    [523, 659, 784].forEach((freq, i) => {
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      o.type = 'triangle';
+      const t = ac.currentTime + i * 0.09;
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.22, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+      o.start(t); o.stop(t + 0.24);
+    });
+  }catch(e){}
+}
+
+// Wrong answer — low buzz
+function playWrong(){
+  try{
+    const ac = getAC();
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(160, ac.currentTime);
+    o.frequency.exponentialRampToValueAtTime(100, ac.currentTime + 0.18);
+    g.gain.setValueAtTime(0.2, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.22);
+    o.start(); o.stop(ac.currentTime + 0.24);
+  }catch(e){}
+}
+
+// Page transition — soft whoosh
+function playNav(){
+  try{
+    const ac = getAC();
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(300, ac.currentTime);
+    o.frequency.exponentialRampToValueAtTime(600, ac.currentTime + 0.12);
+    g.gain.setValueAtTime(0.10, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.14);
+    o.start(); o.stop(ac.currentTime + 0.15);
+  }catch(e){}
+}
+
+// Win / confetti — fanfare
+function playWin(){
+  try{
+    const ac = getAC();
+    [523,659,784,1047].forEach((freq,i)=>{
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      o.type = 'triangle';
+      const t = ac.currentTime + i*0.11;
+      o.frequency.setValueAtTime(freq,t);
+      g.gain.setValueAtTime(0.25,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+      o.start(t); o.stop(t+0.32);
+    });
+  }catch(e){}
+}
+
+// Attach playClick to ALL button/interactive presses globally
+document.addEventListener('click', e => {
+  const el = e.target.closest('button,[onclick],[class*="btn"],[class*="tile"],[class*="cell"],[class*="opt"],[class*="chip"],[class*="item"],[class*="card"],[class*="fib-letter"],[class*="sc-opt"],[class*="quiz-opt"],[class*="mq-opt"],[class*="fc-btn"],[class*="bn-item"],[class*="syl-tile"],[class*="deck-chip"],[class*="fchip"],[class*="mtab"],[class*="sidebar-item"],[class*="daily-word"],[class*="word-item"],[class*="ltr-tile"],[class*="mission-card"]');
+  if(el && !el.classList.contains('matched') && !el.classList.contains('locked')){
+    playClick();
+  }
+}, true);
+
+/* Перетворює текст перед озвученням щоб TTS не читав як абревіатуру */
+function prepareForTTS(text){
+  const t = text.trim();
+
+  // Список відомих "небезпечних" абревіатур які TTS розшифровує неправильно
+  // Для них додаємо контекстне слово перед складом
+  const badAbbr = new Set(['ГО','БО','МО','СО','ВО','ДО','ЗО','НО','ЛО','ТО','КО','РО','ФО','ХО','ЧО','ШО','ЖО','ЦО','ПО',
+    'ГИ','МИ','ВИ','БИ','ДИ','НИ','ЛИ','СИ','ТИ','КИ','РИ','ФИ','ХИ','ЧИ','ШИ','ЖИ','ЦИ','ПИ',
+    'ГА','МА','ВА','БА','ДА','НА','ЛА','СА','ТА','КА','РА','ФА','ХА','ЧА','ША','ЖА','ЦА','ПА',
+    'ГЕ','МЕ','ВЕ','БЕ','ДЕ','НЕ','ЛЕ','СЕ','ТЕ','КЕ','РЕ','ФЕ','ХЕ','ЧЕ','ШЕ','ЖЕ','ЦЕ','ПЕ',
+    'ГУ','МУ','ВУ','БУ','ДУ','НУ','ЛУ','СУ','ТУ','КУ','РУ','ФУ','ХУ','ЧУ','ШУ','ЖУ','ЦУ','ПУ',
+    'ГІ','МІ','ВІ','БІ','ДІ','НІ','ЛІ','СІ','ТІ','КІ','РІ','ФІ','ХІ','ЧІ','ШІ','ЖІ','ЦІ','ПІ',
+    'ЩА','ЩО','ЩУ','ЩИ','ЩЕ','ЩІ'
+  ]);
+
+  // Якщо це 1 буква — вимовити як назву букви через нижній регістр
+  if(/^[А-ЯЇІЄҐЬ]$/.test(t)){
+    return t.toLowerCase();
+  }
+
+  // Якщо це склад (2-3 великі літери) — переводимо в нижній регістр
+  // і огортаємо в речення щоб TTS не читав як абревіатуру
+  if(/^[А-ЯЇІЄҐЬ]{2,3}$/.test(t)){
+    const lower = t.toLowerCase();
+    if(badAbbr.has(t)){
+      // Додаємо крапку після — це "ламає" розпізнавання абревіатури
+      return lower + '.';
+    }
+    return lower;
+  }
+
+  // Повне слово великими — перевести в нижній регістр
+  if(/^[А-ЯЇІЄҐЬ'\-]+$/.test(t)){
+    return t.toLowerCase();
+  }
+
+  return t;
+}
+
 function speak(text){
   window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
+  const prepared = prepareForTTS(text);
+  const u = new SpeechSynthesisUtterance(prepared);
   u.lang = 'uk-UA';
-  u.rate = 0.82;
+  u.rate = 0.78;
   u.pitch = 1.05;
   const voices = window.speechSynthesis.getVoices();
   const ukV = voices.find(v => v.lang === 'uk-UA' || v.lang.startsWith('uk'));
@@ -1775,6 +1917,7 @@ const bnMap = {
 };
 
 function goPage(id){
+  playNav();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const pg = document.getElementById('page-' + id);
   if(!pg) return;
@@ -2219,6 +2362,7 @@ function checkQZ(el, chosen, correct){
     el.classList.add('ok');
     QZ.score += 10; QZ.ok++;
     addXP(10,'⚡');
+    playCorrect();
     speak(chosen);
     setTimeout(nextQZ, 1400);
   } else {
@@ -2227,6 +2371,7 @@ function checkQZ(el, chosen, correct){
       if(o.textContent.trim() === correct) o.classList.add('ok');
     });
     QZ.lives--; QZ.bad++;
+    playWrong();
     speak('Ні');
     setTimeout(nextQZ, 1600);
   }
@@ -2241,7 +2386,7 @@ function finishQuiz(){
   saveS(); updateUI(); checkAchievements();
 
   const acc = (QZ.ok + QZ.bad) > 0 ? Math.round((QZ.ok/(QZ.ok+QZ.bad))*100) : 0;
-  if(acc >= 70) triggerConfetti();
+  if(acc >= 70){ triggerConfetti(); playWin(); }
 
   const emo = acc >= 80 ? '🏆' : acc >= 60 ? '💪' : '😤';
   const ttl = acc >= 80 ? 'Легенда!' : acc >= 60 ? 'Непогано!' : 'Тренуйся!';
@@ -2346,8 +2491,8 @@ function matchSelectLeft(idx, word){
   document.querySelectorAll('#matchLeft .match-cell.selected').forEach(e => e.classList.remove('selected'));
   el.classList.add('selected');
   gameState.leftSelected = {idx, word};
-  // find pair emoji
   gameState.leftSelectedEmoji = gameState.pairs.find(p => p.w === word)?.e;
+  speak(word);
 }
 
 function matchSelectRight(idx, emoji){
@@ -2360,21 +2505,25 @@ function matchSelectRight(idx, emoji){
     leftEl.classList.remove('selected');
     leftEl.classList.add('matched');
     el.classList.add('matched');
-    gameState.matchedPairs.push({w: gameState.leftSelected.word, e: emoji});
+    const matchedWord = gameState.leftSelected.word;
+    gameState.matchedPairs.push({w: matchedWord, e: emoji});
     gameState.score += 20;
     gameState.leftSelected = null;
     addXP(20,'🔗');
-    speak('Правильно');
+    playCorrect();
+    speak(matchedWord);
     // Update score display
     const scoreEl = document.querySelector('#gameBoardInner [style*="Очки"]');
     if(scoreEl) scoreEl.textContent = 'Очки: ' + gameState.score;
     if(gameState.matchedPairs.length === gameState.pairs.length){
       clearInterval(gameTimer);
+      playWin();
       setTimeout(() => endGame(gameState.score, ''), 1200);
     }
   } else {
     leftEl.classList.add('wrong-shake');
     el.classList.add('wrong-shake');
+    playWrong();
     speak('Ні');
     setTimeout(() => {
       leftEl.classList.remove('wrong-shake','selected');
@@ -2438,6 +2587,7 @@ function checkFIB(el, chosen){
     el.classList.add('right-l');
     gameState.score += 15;
     addXP(15,'❓');
+    playCorrect();
     // Show the correct letter filling the blank
     const blankEl = document.querySelector('.fib-word-display .blank');
     if(blankEl){
@@ -2450,6 +2600,7 @@ function checkFIB(el, chosen){
   } else {
     el.classList.add('wrong-l');
     gameState.lives--;
+    playWrong();
     speak('Ні');
     setTimeout(() => {
       document.querySelectorAll('.fib-letter').forEach(l => {
@@ -2508,12 +2659,14 @@ function checkSound(el, chosen, correct){
     el.classList.add('ok');
     gameState.score += 15;
     addXP(15,'🔊');
+    playCorrect();
     speak(correct);
     setTimeout(() => { gameState.cur++; renderSoundQ(); }, 1500);
   } else {
     el.classList.add('no');
     document.querySelectorAll('.sc-opt').forEach(o => { if(o.textContent.trim() === correct) o.classList.add('ok'); });
     gameState.lives--;
+    playWrong();
     speak('Ні');
     setTimeout(() => {
       if(gameState.lives <= 0){ endGame(gameState.score,''); return; }
@@ -2526,7 +2679,7 @@ function checkSound(el, chosen, correct){
 function endGame(score, extra){
   S.totalGames++;
   saveS(); updateUI(); checkAchievements();
-  if(score >= 60) triggerConfetti();
+  if(score >= 60){ triggerConfetti(); playWin(); }
   speak(score >= 60 ? 'Молодець!' : 'Спробуй ще раз');
 
   document.getElementById('gameResultInner').innerHTML = `
