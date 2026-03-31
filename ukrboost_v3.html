@@ -1,0 +1,2748 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>УКР·БУСТ 2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CSS VARIABLES — DARK & LIGHT THEMES
+   ============================================================ */
+[data-theme="dark"] {
+  --bg:        #0c0c10;
+  --bg2:       #13131a;
+  --bg3:       #1c1c26;
+  --card:      #1e1e2c;
+  --card2:     #252535;
+  --border:    #2e2e42;
+  --text:      #f2f2f7;
+  --text2:     #9898b0;
+  --text3:     #5a5a72;
+  --accent:    #ff5e14;
+  --accent2:   #ff8c00;
+  --blue:      #38b2ff;
+  --green:     #26e07a;
+  --red:       #ff4545;
+  --purple:    #b06bff;
+  --yellow:    #ffd233;
+  --shadow:    rgba(0,0,0,0.5);
+  --overlay:   rgba(0,0,0,0.7);
+  --glow-a:    0 0 24px rgba(255,94,20,0.35);
+  --glow-b:    0 0 24px rgba(56,178,255,0.35);
+  --glow-g:    0 0 24px rgba(38,224,122,0.35);
+}
+[data-theme="light"] {
+  --bg:        #f5f5fa;
+  --bg2:       #eeeef5;
+  --bg3:       #e5e5ef;
+  --card:      #ffffff;
+  --card2:     #f0f0f8;
+  --border:    #d8d8e8;
+  --text:      #111120;
+  --text2:     #5a5a72;
+  --text3:     #aaaabb;
+  --accent:    #e84d00;
+  --accent2:   #ff7a00;
+  --blue:      #007aff;
+  --green:     #17b55a;
+  --red:       #dd2e2e;
+  --purple:    #8a44ee;
+  --yellow:    #e6a800;
+  --shadow:    rgba(0,0,0,0.12);
+  --overlay:   rgba(0,0,0,0.45);
+  --glow-a:    0 2px 12px rgba(232,77,0,0.2);
+  --glow-b:    0 2px 12px rgba(0,122,255,0.2);
+  --glow-g:    0 2px 12px rgba(23,181,90,0.2);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;overflow:hidden}
+body{
+  font-family:'Manrope',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  height:100%;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  transition:background .3s,color .3s;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input{font-family:inherit;outline:none}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ============================================================
+   TOP BAR
+   ============================================================ */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 18px 10px;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  position:relative;
+  z-index:50;
+}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.menu-btn{
+  width:38px;height:38px;
+  border-radius:12px;
+  background:var(--card);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:5px;
+  cursor:pointer;transition:all .2s;
+  flex-shrink:0;
+}
+.menu-btn span{
+  display:block;width:18px;height:2px;
+  background:var(--text);border-radius:2px;
+  transition:all .25s;
+}
+.menu-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.menu-btn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.menu-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+.logo{
+  font-family:'Unbounded',sans-serif;
+  font-weight:900;
+  font-size:17px;
+  letter-spacing:-0.5px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+.topbar-right{display:flex;align-items:center;gap:8px}
+
+.xp-chip{
+  display:flex;align-items:center;gap:5px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:5px 12px;
+  font-size:12px;font-weight:700;
+  font-family:'Unbounded',sans-serif;
+  color:var(--accent2);
+}
+
+.streak-chip{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(255,94,20,.12);
+  border:1px solid rgba(255,94,20,.25);
+  border-radius:20px;
+  padding:5px 10px;
+  font-size:12px;font-weight:700;
+  color:var(--accent);
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.sidebar-overlay{
+  position:fixed;inset:0;
+  background:var(--overlay);
+  z-index:200;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+  backdrop-filter:blur(4px);
+}
+.sidebar-overlay.show{opacity:1;pointer-events:all}
+
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;
+  width:280px;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  z-index:210;
+  transform:translateX(-100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.sidebar.open{transform:translateX(0)}
+
+.sidebar-header{
+  padding:20px 20px 16px;
+  border-bottom:1px solid var(--border);
+}
+.sidebar-logo{
+  font-family:'Unbounded',sans-serif;
+  font-weight:900;font-size:20px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:4px;
+}
+.sidebar-tagline{font-size:12px;color:var(--text2)}
+
+.sidebar-profile{
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.sidebar-avatar{
+  width:46px;height:46px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+  box-shadow:var(--glow-a);
+}
+.sidebar-name{font-weight:700;font-size:14px;margin-bottom:2px}
+.sidebar-rank{font-size:11px;color:var(--accent);font-weight:600}
+
+.sidebar-xp-bar{
+  margin:0 20px 16px;
+  padding:10px 12px;
+  background:var(--card);border-radius:12px;
+  border:1px solid var(--border);
+}
+.sidebar-xp-label{
+  display:flex;justify-content:space-between;
+  font-size:11px;color:var(--text2);margin-bottom:6px;
+}
+.progress-track{
+  height:6px;background:var(--bg3);border-radius:6px;overflow:hidden;
+}
+.progress-fill-bar{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:6px;transition:width .5s ease;
+}
+
+.sidebar-nav{
+  flex:1;overflow-y:auto;
+  padding:8px 12px;
+}
+.sidebar-section-label{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text3);font-weight:700;
+  padding:10px 8px 6px;
+}
+.sidebar-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;
+  border-radius:14px;
+  cursor:pointer;
+  transition:all .18s;
+  color:var(--text2);
+  font-size:14px;font-weight:600;
+  margin-bottom:2px;
+}
+.sidebar-item:hover{background:var(--card);color:var(--text)}
+.sidebar-item.active{
+  background:linear-gradient(135deg,rgba(255,94,20,.18),rgba(255,140,0,.1));
+  color:var(--accent);
+  border:1px solid rgba(255,94,20,.2);
+}
+.sidebar-item-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.sidebar-item-badge{
+  margin-left:auto;
+  background:var(--accent);color:white;
+  font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:20px;
+  font-family:'Unbounded',sans-serif;
+}
+
+.sidebar-bottom{
+  padding:12px 20px;
+  border-top:1px solid var(--border);
+}
+.theme-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:12px 14px;
+  cursor:pointer;
+  margin-bottom:8px;
+}
+.theme-toggle-label{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.toggle-switch{
+  width:40px;height:22px;
+  background:var(--bg3);
+  border-radius:11px;position:relative;
+  transition:background .3s;
+  border:1px solid var(--border);
+}
+.toggle-switch.on{background:var(--accent)}
+.toggle-knob{
+  width:16px;height:16px;
+  background:white;border-radius:50%;
+  position:absolute;top:2px;left:2px;
+  transition:left .25s;box-shadow:0 1px 4px var(--shadow);
+}
+.toggle-switch.on .toggle-knob{left:20px}
+
+.sidebar-stats-row{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:8px;margin-bottom:8px;
+}
+.mini-stat{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:8px 6px;text-align:center;
+}
+.mini-stat-val{font-family:'Unbounded',sans-serif;font-weight:700;font-size:15px}
+.mini-stat-val.a{color:var(--accent)}
+.mini-stat-val.b{color:var(--blue)}
+.mini-stat-val.g{color:var(--green)}
+.mini-stat-lbl{font-size:10px;color:var(--text2);margin-top:2px}
+
+/* ============================================================
+   MAIN CONTENT AREA
+   ============================================================ */
+.app-body{
+  flex:1;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.page{display:none;flex:1;overflow-y:auto;padding:18px 18px 90px}
+.page.active{display:block}
+
+/* ============================================================
+   HOME PAGE
+   ============================================================ */
+.hero{
+  background:linear-gradient(135deg,#1a0800 0%,#0a0a1a 60%,#001020 100%);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:24px 20px;
+  margin-bottom:22px;
+  position:relative;overflow:hidden;
+}
+[data-theme="light"] .hero{
+  background:linear-gradient(135deg,#fff5ee 0%,#eef5ff 100%);
+}
+.hero::after{
+  content:'🏎️';
+  position:absolute;right:-8px;bottom:-12px;
+  font-size:90px;opacity:.1;transform:rotate(-15deg);
+  pointer-events:none;
+}
+.hero-title{
+  font-family:'Unbounded',sans-serif;
+  font-weight:900;font-size:22px;line-height:1.25;
+  margin-bottom:6px;
+}
+.hero-title .hot{color:var(--accent)}
+.hero-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px}
+.overall-bar{
+  background:var(--bg3);border-radius:8px;
+  height:10px;overflow:hidden;margin-bottom:6px;
+}
+.overall-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--accent2),var(--blue));
+  border-radius:8px;transition:width .6s ease;
+}
+.overall-pct{font-size:12px;color:var(--text2)}
+.overall-pct span{color:var(--accent);font-weight:700}
+
+.home-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:12px;margin-bottom:22px;
+}
+
+.home-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:18px 14px;
+  cursor:pointer;
+  transition:all .2s;
+  position:relative;overflow:hidden;
+  text-align:left;
+  display:block;
+}
+.home-card::before{
+  content:'';position:absolute;
+  top:-20px;right:-20px;
+  width:70px;height:70px;
+  border-radius:50%;
+  opacity:.08;transition:opacity .2s;
+}
+.home-card:active{transform:scale(.96)}
+.home-card:active::before{opacity:.15}
+.home-card.c-letters::before{background:var(--accent)}
+.home-card.c-syllables::before{background:var(--blue)}
+.home-card.c-words::before{background:var(--green)}
+.home-card.c-quiz::before{background:var(--purple)}
+.home-card.c-game::before{background:var(--yellow)}
+.home-card.c-learn::before{background:var(--accent2)}
+
+.home-card-ico{font-size:30px;margin-bottom:10px}
+.home-card-name{
+  font-family:'Unbounded',sans-serif;
+  font-weight:700;font-size:13px;margin-bottom:4px;
+  line-height:1.3;
+}
+.home-card-desc{font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:10px}
+.home-card-prog{
+  height:4px;background:var(--bg3);
+  border-radius:4px;overflow:hidden;
+}
+.hcp-fill{height:100%;border-radius:4px;transition:width .5s}
+.c-letters .hcp-fill{background:var(--accent)}
+.c-syllables .hcp-fill{background:var(--blue)}
+.c-words .hcp-fill{background:var(--green)}
+.c-quiz .hcp-fill{background:var(--purple)}
+.c-game .hcp-fill{background:var(--yellow)}
+.c-learn .hcp-fill{background:var(--accent2)}
+
+.home-card .badge{
+  position:absolute;top:10px;right:10px;
+  background:var(--accent);color:white;
+  font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:10px;
+  font-family:'Unbounded',sans-serif;
+}
+
+.section-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.section-hdr-title{
+  font-family:'Unbounded',sans-serif;
+  font-weight:700;font-size:11px;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text2);
+}
+.section-hdr-link{font-size:12px;color:var(--accent);font-weight:600;cursor:pointer}
+
+.daily-words{display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
+
+.daily-word-row{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:12px 14px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;transition:all .18s;
+}
+.daily-word-row:active{transform:scale(.98)}
+.dwr-emoji{font-size:26px;flex-shrink:0}
+.dwr-text{flex:1}
+.dwr-uk{font-family:'Unbounded',sans-serif;font-weight:700;font-size:15px;margin-bottom:2px}
+.dwr-syl{font-size:11px;color:var(--accent);font-weight:600}
+.dwr-sound{
+  width:36px;height:36px;border-radius:12px;
+  background:rgba(56,178,255,.12);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+  border:1px solid rgba(56,178,255,.2);
+  transition:all .18s;
+}
+.dwr-sound:active{transform:scale(.9)}
+
+/* ============================================================
+   LETTERS PAGE
+   ============================================================ */
+.page-title{
+  font-family:'Unbounded',sans-serif;
+  font-weight:900;font-size:20px;margin-bottom:4px;
+}
+.page-sub{font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.5}
+
+.filter-bar{
+  display:flex;gap:8px;overflow-x:auto;
+  padding-bottom:4px;margin-bottom:16px;
+}
+.filter-bar::-webkit-scrollbar{display:none}
+.fchip{
+  flex-shrink:0;
+  padding:7px 14px;border-radius:20px;
+  border:1.5px solid var(--border);
+  background:var(--card);
+  font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .2s;color:var(--text2);
+}
+.fchip.on{
+  background:var(--accent);border-color:var(--accent);
+  color:white;
+}
+
+.alphabet-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  gap:10px;margin-bottom:20px;
+}
+.ltr-tile{
+  aspect-ratio:1;
+  background:var(--card);border:2px solid var(--border);
+  border-radius:16px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;
+  position:relative;
+}
+.ltr-tile:active{transform:scale(.9)}
+.ltr-tile.done{border-color:var(--accent);background:rgba(255,94,20,.08)}
+.ltr-tile.vowel{border-color:var(--blue)!important;background:rgba(56,178,255,.06)!important}
+.ltr-tile.vowel.done{background:rgba(56,178,255,.14)!important}
+.ltr-tile .big{
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:20px;line-height:1;
+}
+.ltr-tile .sm{font-size:12px;color:var(--text2);margin-top:2px}
+.ltr-tile .ck{
+  position:absolute;top:4px;right:6px;
+  font-size:10px;color:var(--accent);
+}
+.ltr-tile.vowel .ck{color:var(--blue)}
+
+/* LETTER DETAIL */
+.ltr-detail-header{
+  background:linear-gradient(135deg,var(--card),var(--bg3));
+  border:1px solid var(--border);border-radius:24px;
+  padding:32px 20px 24px;text-align:center;
+  margin-bottom:16px;position:relative;overflow:hidden;
+}
+.ltr-giant{
+  font-family:'Unbounded',sans-serif;font-weight:900;font-size:96px;
+  line-height:1;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.ltr-name-label{font-size:15px;color:var(--text2);margin-bottom:20px;font-weight:600}
+
+.btn-speak{
+  display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:50px;padding:13px 28px;
+  color:white;font-family:'Unbounded',sans-serif;font-weight:700;font-size:14px;
+  cursor:pointer;transition:all .2s;box-shadow:var(--glow-a);
+}
+.btn-speak:active{transform:scale(.95)}
+.btn-speak.blue-v{
+  background:transparent;border:2px solid var(--blue);
+  color:var(--blue);box-shadow:var(--glow-b);
+}
+
+.examples-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:18px;padding:16px;margin-bottom:14px;
+}
+.examples-card-title{
+  font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text2);font-weight:700;margin-bottom:12px;
+}
+.ex-word{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:opacity .15s;
+}
+.ex-word:last-child{border-bottom:none}
+.ex-word:active{opacity:.6}
+.ex-word-txt{font-family:'Unbounded',sans-serif;font-weight:700;font-size:17px}
+.ex-word-txt .hl{color:var(--accent)}
+.ex-word-ico{font-size:22px}
+
+.mini-quiz-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:18px;padding:16px;margin-bottom:14px;
+}
+.mq-q{font-weight:600;font-size:14px;margin-bottom:14px}
+.mq-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mq-opt{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:14px;padding:14px 8px;
+  text-align:center;
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:18px;
+  cursor:pointer;transition:all .2s;
+}
+.mq-opt:active{transform:scale(.94)}
+.mq-opt.ok{border-color:var(--green);background:rgba(38,224,122,.1);color:var(--green)}
+.mq-opt.no{border-color:var(--red);background:rgba(255,69,69,.1);color:var(--red)}
+.mq-opt.dis{pointer-events:none;opacity:.4}
+.mq-feedback{margin-top:10px;font-size:13px;min-height:18px;font-weight:600}
+
+.btn-full{
+  width:100%;padding:15px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:16px;
+  color:white;font-family:'Unbounded',sans-serif;font-weight:700;font-size:15px;
+  cursor:pointer;transition:all .2s;box-shadow:var(--glow-a);
+  margin-bottom:10px;
+}
+.btn-full:active{transform:scale(.97)}
+.btn-full.outline{
+  background:transparent;border:2px solid var(--border);
+  color:var(--text);box-shadow:none;
+}
+.btn-full.blue{
+  background:linear-gradient(135deg,#0070cc,var(--blue));
+  box-shadow:var(--glow-b);
+}
+.btn-full.green{
+  background:linear-gradient(135deg,#0a9e4a,var(--green));
+  box-shadow:var(--glow-g);
+}
+
+/* ============================================================
+   SYLLABLES PAGE
+   ============================================================ */
+.syl-groups{display:flex;flex-direction:column;gap:20px}
+.syl-group-title{
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:13px;
+  margin-bottom:10px;color:var(--text2);
+}
+.syl-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+}
+.syl-tile{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:16px;padding:16px 8px;
+  text-align:center;cursor:pointer;transition:all .2s;
+}
+.syl-tile:active{transform:scale(.92)}
+.syl-tile.done{border-color:var(--blue);background:rgba(56,178,255,.08)}
+.syl-tile-txt{
+  font-family:'Unbounded',sans-serif;font-weight:900;font-size:26px;
+  color:var(--blue);line-height:1;margin-bottom:4px;
+}
+.syl-tile-sub{font-size:10px;color:var(--text2)}
+
+/* ============================================================
+   WORDS PAGE
+   ============================================================ */
+.words-filter{
+  display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;
+}
+.words-filter::-webkit-scrollbar{display:none}
+
+.word-categories{display:flex;flex-direction:column;gap:20px}
+.wcat-header{
+  display:flex;align-items:center;gap:10px;margin-bottom:12px;
+}
+.wcat-ico{font-size:20px}
+.wcat-name{font-family:'Unbounded',sans-serif;font-weight:700;font-size:14px}
+
+.word-item{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:13px 14px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;transition:all .18s;margin-bottom:8px;
+}
+.word-item:active{transform:scale(.98)}
+.word-item.learned{border-color:var(--green)}
+.wi-emoji{font-size:26px;flex-shrink:0}
+.wi-info{flex:1}
+.wi-uk{font-family:'Unbounded',sans-serif;font-weight:700;font-size:17px;margin-bottom:2px}
+.wi-syl{font-size:11px;color:var(--accent);font-weight:600}
+.wi-actions{display:flex;align-items:center;gap:6px}
+.ibi{
+  width:36px;height:36px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;transition:all .18s;
+  border:1px solid var(--border);
+}
+.ibi:active{transform:scale(.9)}
+.ibi.snd{background:rgba(56,178,255,.1);color:var(--blue);border-color:rgba(56,178,255,.2)}
+.ibi.chk{background:rgba(38,224,122,.1);color:var(--text2);border-color:rgba(38,224,122,.2)}
+.ibi.chk.on{color:var(--green)}
+
+/* ============================================================
+   QUIZ PAGE
+   ============================================================ */
+.quiz-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.quiz-lives{font-size:18px;letter-spacing:3px}
+.quiz-score-disp{
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:16px;
+}
+.quiz-score-disp span{color:var(--accent)}
+
+.quiz-prog-bar{
+  height:6px;background:var(--bg3);border-radius:6px;overflow:hidden;margin-bottom:20px;
+}
+.quiz-prog-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--blue));
+  border-radius:6px;transition:width .4s ease;
+}
+
+.quiz-card{
+  background:linear-gradient(135deg,var(--card),var(--bg3));
+  border:1px solid var(--border);border-radius:24px;
+  padding:28px 18px;text-align:center;margin-bottom:18px;
+}
+.quiz-type-tag{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text3);margin-bottom:16px;
+  font-weight:700;
+}
+.quiz-display{
+  font-family:'Unbounded',sans-serif;font-weight:900;font-size:68px;
+  color:var(--accent);line-height:1;cursor:pointer;margin-bottom:8px;
+  transition:transform .1s;
+}
+.quiz-display:active{transform:scale(.94)}
+.quiz-display.word-mode{font-size:28px;color:var(--text);padding:10px 0}
+.quiz-q-txt{font-size:14px;color:var(--text2);font-weight:500}
+.quiz-hint{font-size:11px;color:var(--text3);margin-top:4px}
+
+.quiz-opts-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+.quiz-opt{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:16px;padding:16px 10px;
+  text-align:center;cursor:pointer;transition:all .2s;
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:20px;
+}
+.quiz-opt:active{transform:scale(.95)}
+.quiz-opt.ok{border-color:var(--green);background:rgba(38,224,122,.12);color:var(--green);animation:popIn .25s}
+.quiz-opt.no{border-color:var(--red);background:rgba(255,69,69,.12);color:var(--red);animation:wiggle .3s}
+.quiz-opt.dis{pointer-events:none;opacity:.4}
+.quiz-opt-word{font-size:14px}
+
+@keyframes popIn{0%{transform:scale(.96)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+@keyframes wiggle{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ============================================================
+   WORD MATCH GAME
+   ============================================================ */
+.game-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:20px;margin-bottom:14px;
+}
+.game-title-bar{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;
+}
+.game-name{font-family:'Unbounded',sans-serif;font-weight:700;font-size:15px}
+.game-timer{
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:18px;
+  color:var(--accent);
+  background:rgba(255,94,20,.1);border:1px solid rgba(255,94,20,.2);
+  border-radius:10px;padding:4px 12px;
+}
+.game-timer.warn{color:var(--red);background:rgba(255,69,69,.1);border-color:rgba(255,69,69,.2);animation:pulse .5s infinite alternate}
+@keyframes pulse{from{opacity:1}to{opacity:.5}}
+
+.match-pairs{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.match-col{display:flex;flex-direction:column;gap:8px}
+.match-cell{
+  background:var(--bg3);border:2px solid var(--border);
+  border-radius:14px;padding:0 10px;
+  text-align:center;cursor:pointer;transition:all .2s;
+  font-weight:700;font-size:14px;
+  font-family:'Unbounded',sans-serif;
+  height:58px;
+  display:flex;align-items:center;justify-content:center;
+  min-height:58px;
+  line-height:1.2;
+  word-break:break-all;
+}
+.match-cell:active{transform:scale(.95)}
+.match-cell.selected{border-color:var(--accent);background:rgba(255,94,20,.12);color:var(--accent)}
+.match-cell.matched{border-color:var(--green);background:rgba(38,224,122,.1);color:var(--green);pointer-events:none}
+.match-cell.wrong-shake{animation:wiggle .3s;border-color:var(--red)}
+.match-cell.emoji-cell{font-size:28px;}
+
+/* FILL-IN-BLANK GAME */
+.fib-word-display{
+  font-family:'Unbounded',sans-serif;font-weight:900;
+  font-size:42px;color:var(--text);
+  letter-spacing:8px;text-align:center;
+  padding:20px;background:var(--bg3);
+  border-radius:16px;margin-bottom:16px;
+}
+.fib-word-display .blank{
+  color:var(--accent);
+  border-bottom:3px solid var(--accent);
+  min-width:30px;display:inline-block;
+}
+.fib-letters{
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:center;
+  margin-bottom:16px;
+}
+.fib-letter{
+  width:50px;height:50px;
+  background:var(--card);border:2px solid var(--border);
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:20px;
+  cursor:pointer;transition:all .2s;
+}
+.fib-letter:active{transform:scale(.9)}
+.fib-letter.used{opacity:.3;pointer-events:none}
+.fib-letter.wrong-l{border-color:var(--red);animation:wiggle .3s}
+.fib-letter.right-l{border-color:var(--green);background:rgba(38,224,122,.15)}
+
+/* SOUND CHALLENGE */
+.sound-challenge{text-align:center;padding:20px 0}
+.sc-emoji{font-size:80px;margin-bottom:16px;display:block}
+.sc-question{font-size:16px;color:var(--text2);margin-bottom:20px;font-weight:600}
+.sc-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sc-opt{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:16px;padding:18px 10px;text-align:center;
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:18px;
+  cursor:pointer;transition:all .2s;
+}
+.sc-opt:active{transform:scale(.95)}
+.sc-opt.ok{border-color:var(--green);background:rgba(38,224,122,.12);color:var(--green)}
+.sc-opt.no{border-color:var(--red);background:rgba(255,69,69,.12);color:var(--red)}
+
+/* ============================================================
+   SELF-STUDY / FLASHCARDS PAGE
+   ============================================================ */
+.flashcard-wrap{
+  perspective:1000px;
+  margin-bottom:20px;
+  cursor:pointer;
+}
+.flashcard{
+  background:linear-gradient(135deg,var(--card),var(--bg3));
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:48px 24px;
+  text-align:center;
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,0,.2,1);
+  position:relative;
+  min-height:220px;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-front,.fc-back{
+  backface-visibility:hidden;
+  width:100%;
+}
+.fc-back{
+  transform:rotateY(180deg);
+  position:absolute;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+}
+.fc-emoji{font-size:56px;margin-bottom:12px}
+.fc-main{
+  font-family:'Unbounded',sans-serif;font-weight:900;font-size:48px;
+  color:var(--accent);line-height:1;margin-bottom:8px;
+}
+.fc-sub{font-size:14px;color:var(--text2);font-weight:600}
+.fc-hint{font-size:12px;color:var(--text3);margin-top:8px}
+.fc-back .fc-main{font-size:22px;color:var(--text)}
+.fc-back .fc-syl{font-size:14px;color:var(--accent);margin-top:4px}
+
+.fc-controls{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;
+}
+.fc-btn{
+  padding:14px 8px;border-radius:14px;
+  text-align:center;font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;
+  cursor:pointer;transition:all .2s;border:2px solid var(--border);
+  background:var(--card);color:var(--text2);
+}
+.fc-btn:active{transform:scale(.95)}
+.fc-btn.know{border-color:var(--green);color:var(--green);background:rgba(38,224,122,.08)}
+.fc-btn.repeat{border-color:var(--red);color:var(--red);background:rgba(255,69,69,.08)}
+.fc-btn.flip{border-color:var(--blue);color:var(--blue);background:rgba(56,178,255,.08)}
+
+.fc-progress-txt{
+  text-align:center;font-size:12px;color:var(--text2);margin-bottom:14px;
+}
+.fc-progress-txt span{color:var(--accent);font-weight:700}
+
+.fc-deck-select{
+  display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;
+}
+.fc-deck-select::-webkit-scrollbar{display:none}
+.deck-chip{
+  flex-shrink:0;padding:8px 16px;
+  border-radius:20px;border:1.5px solid var(--border);
+  background:var(--card);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .2s;color:var(--text2);
+}
+.deck-chip.on{background:var(--blue);border-color:var(--blue);color:white}
+
+/* ============================================================
+   PARENT MISSIONS
+   ============================================================ */
+.missions-grid{display:flex;flex-direction:column;gap:10px}
+.mission-card{
+  background:var(--bg3);border:2px solid var(--border);
+  border-radius:16px;padding:14px 16px;
+  cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:14px;
+  position:relative;overflow:hidden;
+}
+.mission-card:active{transform:scale(.98)}
+.mission-card.done{border-color:var(--green);background:rgba(38,224,122,.06);opacity:.7}
+.mission-card.locked{opacity:.45;cursor:not-allowed}
+.mission-card.active-m{border-color:var(--accent);background:rgba(255,94,20,.07);box-shadow:var(--glow-a)}
+.mission-ico{font-size:28px;flex-shrink:0}
+.mission-info{flex:1}
+.mission-name{font-family:'Unbounded',sans-serif;font-weight:700;font-size:13px;margin-bottom:3px}
+.mission-desc{font-size:11px;color:var(--text2);line-height:1.5}
+.mission-xp{
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:11px;
+  color:var(--accent2);background:rgba(255,140,0,.12);
+  border:1px solid rgba(255,140,0,.2);
+  border-radius:10px;padding:3px 8px;flex-shrink:0;
+}
+.mission-done-badge{font-size:20px;flex-shrink:0}
+.mission-lvl-badge{
+  font-size:9px;font-weight:700;font-family:'Unbounded',sans-serif;
+  letter-spacing:1px;padding:2px 8px;border-radius:10px;
+  display:inline-block;margin-bottom:4px;
+}
+.mission-lvl-badge.easy{background:rgba(38,224,122,.15);color:var(--green)}
+.mission-lvl-badge.medium{background:rgba(56,178,255,.15);color:var(--blue)}
+.mission-lvl-badge.hard{background:rgba(255,94,20,.15);color:var(--accent)}
+.mission-lvl-badge.epic{background:rgba(176,107,255,.15);color:var(--purple)}
+.mission-progress-bar{height:4px;background:var(--bg);border-radius:4px;margin-top:6px;overflow:hidden}
+.mission-progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s}
+
+/* PARENT PAGE MISSION PANEL */
+.parent-mission-section{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:18px;margin-bottom:16px;
+}
+.missions-tabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto}
+.missions-tabs::-webkit-scrollbar{display:none}
+.mtab{
+  flex-shrink:0;padding:7px 14px;border-radius:20px;
+  border:1.5px solid var(--border);background:var(--bg3);
+  font-size:11px;font-weight:700;cursor:pointer;
+  transition:all .2s;color:var(--text2);
+  font-family:'Unbounded',sans-serif;
+}
+.mtab.on{background:var(--accent);border-color:var(--accent);color:white}
+
+.parent-section{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:18px;margin-bottom:16px;
+}
+.parent-section-title{
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:14px;
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+
+.parent-stat-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;
+}
+.pstat{
+  background:var(--bg3);border-radius:14px;padding:14px;text-align:center;
+}
+.pstat-val{
+  font-family:'Unbounded',sans-serif;font-weight:900;font-size:26px;
+  margin-bottom:2px;
+}
+.pstat-val.a{color:var(--accent)}
+.pstat-val.b{color:var(--blue)}
+.pstat-val.g{color:var(--green)}
+.pstat-val.p{color:var(--purple)}
+.pstat-lbl{font-size:11px;color:var(--text2)}
+
+.parent-progress-item{
+  display:flex;align-items:center;gap:12px;margin-bottom:12px;
+}
+.ppi-label{font-size:13px;font-weight:600;width:80px;flex-shrink:0}
+.ppi-bar{flex:1;height:8px;background:var(--bg3);border-radius:8px;overflow:hidden}
+.ppi-fill{height:100%;border-radius:8px;transition:width .5s}
+.ppi-pct{font-size:12px;color:var(--text2);font-weight:600;width:36px;text-align:right;flex-shrink:0}
+
+.ach-list{display:flex;flex-direction:column;gap:8px}
+.ach-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg3);border-radius:14px;padding:12px 14px;
+}
+.ach-ico2{font-size:22px;flex-shrink:0}
+.ach-info2{flex:1}
+.ach-nm2{font-weight:700;font-size:13px;margin-bottom:2px}
+.ach-desc2{font-size:11px;color:var(--text2)}
+.ach-locked2{opacity:.4}
+.ach-done{color:var(--green);font-size:18px}
+
+/* ============================================================
+   RESULT SCREEN
+   ============================================================ */
+.result-hero{
+  background:linear-gradient(135deg,#0f0800,#001508);
+  border:1px solid var(--border);border-radius:24px;
+  padding:40px 20px;text-align:center;margin-bottom:20px;
+}
+[data-theme="light"] .result-hero{
+  background:linear-gradient(135deg,#fff8f0,#f0fff5);
+}
+.result-emo{font-size:64px;margin-bottom:14px}
+.result-ttl{
+  font-family:'Unbounded',sans-serif;font-weight:900;font-size:26px;
+  margin-bottom:8px;
+}
+.result-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+.result-stats-row{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;
+}
+.rs-box{background:var(--bg3);border-radius:14px;padding:14px 8px;text-align:center}
+.rs-val{font-family:'Unbounded',sans-serif;font-weight:900;font-size:26px}
+.rs-val.a{color:var(--accent)}
+.rs-val.g{color:var(--green)}
+.rs-val.b{color:var(--blue)}
+.rs-lbl{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* ============================================================
+   CONFETTI
+   ============================================================ */
+#confettiLayer{
+  position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden;
+}
+.cp{
+  position:absolute;width:8px;height:8px;border-radius:2px;
+  animation:cfFall linear forwards;
+}
+@keyframes cfFall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1}
+  100%{transform:translateY(105vh) rotate(720deg);opacity:0}
+}
+
+/* ============================================================
+   XP POPUP
+   ============================================================ */
+.xp-toast{
+  position:fixed;top:72px;right:16px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:white;padding:8px 16px;border-radius:20px;
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:14px;
+  animation:toastAnim 1.6s ease forwards;
+  z-index:500;pointer-events:none;
+  box-shadow:var(--glow-a);
+}
+@keyframes toastAnim{
+  0%{opacity:0;transform:translateY(8px) scale(.85)}
+  18%{opacity:1;transform:translateY(0) scale(1)}
+  72%{opacity:1;transform:translateY(0)}
+  100%{opacity:0;transform:translateY(-16px)}
+}
+
+/* ============================================================
+   SETTINGS OVERLAY (inside sidebar bottom)
+   ============================================================ */
+.settings-panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;margin-top:10px;padding:12px;
+}
+.settings-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;border-bottom:1px solid var(--border);
+}
+.settings-row:last-child{border-bottom:none}
+.settings-label{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+
+/* ============================================================
+   BOTTOM NAV
+   ============================================================ */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  display:grid;grid-template-columns:repeat(5,1fr);
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+  z-index:100;
+  backdrop-filter:blur(20px);
+}
+.bn-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;transition:all .18s;padding:4px;
+}
+.bn-item:active{transform:scale(.88)}
+.bn-ico{font-size:20px;transition:all .2s}
+.bn-lbl{font-size:9px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;transition:all .2s;font-family:'Unbounded',sans-serif}
+.bn-item.on .bn-ico{filter:drop-shadow(0 0 6px var(--accent))}
+.bn-item.on .bn-lbl{color:var(--accent)}
+
+/* ============================================================
+   MISC UTILITIES
+   ============================================================ */
+.tip{
+  display:flex;gap:8px;
+  background:rgba(56,178,255,.08);border:1px solid rgba(56,178,255,.18);
+  border-radius:14px;padding:11px 14px;
+  font-size:12px;color:var(--blue);margin-bottom:14px;line-height:1.5;
+}
+.tip-ico{font-size:16px;flex-shrink:0;margin-top:1px}
+
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+.tag{
+  display:inline-block;padding:3px 10px;border-radius:20px;
+  font-size:10px;font-weight:700;font-family:'Unbounded',sans-serif;
+  background:rgba(255,94,20,.12);color:var(--accent);
+  border:1px solid rgba(255,94,20,.2);
+  margin-bottom:14px;
+}
+.tag.blue{background:rgba(56,178,255,.12);color:var(--blue);border-color:rgba(56,178,255,.2)}
+.tag.green{background:rgba(38,224,122,.12);color:var(--green);border-color:rgba(38,224,122,.2)}
+</style>
+</head>
+<body>
+
+<!-- CONFETTI -->
+<div id="confettiLayer"></div>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">УКР·БУСТ</div>
+    <div class="sidebar-tagline">Прокачай свою українську 🔥</div>
+  </div>
+
+  <div class="sidebar-profile">
+    <div class="sidebar-avatar">🏎️</div>
+    <div>
+      <div class="sidebar-name" id="sb-name">Гонщик</div>
+      <div class="sidebar-rank" id="sb-rank">🔰 Новачок</div>
+    </div>
+  </div>
+
+  <div class="sidebar-xp-bar">
+    <div class="sidebar-xp-label">
+      <span>Прогрес до наступного рівня</span>
+      <span id="sb-xp-txt">0 / 100 XP</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill-bar" id="sb-xp-bar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="sidebar-stats-row" style="padding:0 20px;margin-bottom:12px">
+    <div class="mini-stat">
+      <div class="mini-stat-val a" id="sb-letters">0</div>
+      <div class="mini-stat-lbl">Букви</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-stat-val b" id="sb-syllables">0</div>
+      <div class="mini-stat-lbl">Склади</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-stat-val g" id="sb-words-stat">0</div>
+      <div class="mini-stat-lbl">Слова</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Навчання</div>
+    <div class="sidebar-item active" id="sbi-home" onclick="goPage('home')">
+      <span class="sidebar-item-icon">🏠</span> Головна
+    </div>
+    <div class="sidebar-item" id="sbi-letters" onclick="goPage('letters')">
+      <span class="sidebar-item-icon">🔤</span> Букви
+    </div>
+    <div class="sidebar-item" id="sbi-syllables" onclick="goPage('syllables')">
+      <span class="sidebar-item-icon">📖</span> Склади
+    </div>
+    <div class="sidebar-item" id="sbi-words" onclick="goPage('words')">
+      <span class="sidebar-item-icon">🚗</span> Слова
+    </div>
+    <div class="sidebar-item" id="sbi-flashcards" onclick="goPage('flashcards')">
+      <span class="sidebar-item-icon">🃏</span> Флешкарти
+    </div>
+
+    <div class="sidebar-section-label">Тести та Ігри</div>
+    <div class="sidebar-item" id="sbi-quiz" onclick="goPage('quiz-select')">
+      <span class="sidebar-item-icon">⚡</span> Квіз
+    </div>
+    <div class="sidebar-item" id="sbi-games" onclick="goPage('games')">
+      <span class="sidebar-item-icon">🎮</span> Ігри
+    </div>
+
+    <div class="sidebar-section-label">Інше</div>
+    <div class="sidebar-item" id="sbi-parent" onclick="goPage('parent')">
+      <span class="sidebar-item-icon">👨‍👦</span> Режим батька
+    </div>
+    <div class="sidebar-item" id="sbi-achievements" onclick="goPage('achievements')">
+      <span class="sidebar-item-icon">🏆</span> Досягнення
+    </div>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <div class="theme-toggle-label">
+        <span id="theme-ico">🌙</span>
+        <span id="theme-lbl">Темна тема</span>
+      </div>
+      <div class="toggle-switch" id="themeToggle">
+        <div class="toggle-knob"></div>
+      </div>
+    </div>
+    <button class="btn-full outline" style="font-size:12px;padding:10px" onclick="if(confirm('Скинути весь прогрес?')){clearAll()}">
+      🗑️ Скинути прогрес
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     TOP BAR
+     ============================================================ -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="menu-btn" id="menuBtn" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="logo">УКР·БУСТ</div>
+  </div>
+  <div class="topbar-right">
+    <div class="xp-chip">⚡ <span id="topXP">0</span></div>
+    <div class="streak-chip">🔥 <span id="topStreak">0</span></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     APP BODY
+     ============================================================ -->
+<div class="app-body">
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-title"><span class="hot">🔥</span> Прокачай<br>українську!</div>
+    <div class="hero-sub">Вчи букви, склади, слова. Грай в ігри. Ставай чемпіоном!</div>
+    <div class="overall-bar"><div class="overall-bar-fill" id="overallFill" style="width:0%"></div></div>
+    <div class="overall-pct">Загальний прогрес: <span id="overallPct">0%</span></div>
+  </div>
+
+  <div class="section-hdr">
+    <div class="section-hdr-title">Модулі</div>
+  </div>
+  <div class="home-grid">
+    <div class="home-card c-letters" onclick="goPage('letters')">
+      <div class="badge">СТАРТ</div>
+      <div class="home-card-ico">🔤</div>
+      <div class="home-card-name">Букви</div>
+      <div class="home-card-desc">Весь алфавіт з прикладами</div>
+      <div class="home-card-prog"><div class="hcp-fill" id="hp-letters" style="width:0%"></div></div>
+    </div>
+    <div class="home-card c-syllables" onclick="goPage('syllables')">
+      <div class="home-card-ico">📖</div>
+      <div class="home-card-name">Склади</div>
+      <div class="home-card-desc">З'єднуй букви разом</div>
+      <div class="home-card-prog"><div class="hcp-fill" id="hp-syl" style="width:0%"></div></div>
+    </div>
+    <div class="home-card c-words" onclick="goPage('words')">
+      <div class="home-card-ico">🚗</div>
+      <div class="home-card-name">Слова</div>
+      <div class="home-card-desc">Машини, мото, музика й більше</div>
+      <div class="home-card-prog"><div class="hcp-fill" id="hp-words" style="width:0%"></div></div>
+    </div>
+    <div class="home-card c-quiz" onclick="goPage('quiz-select')">
+      <div class="home-card-ico">⚡</div>
+      <div class="home-card-name">Квіз</div>
+      <div class="home-card-desc">Перевір свої знання!</div>
+      <div class="home-card-prog"><div class="hcp-fill" id="hp-quiz" style="width:0%"></div></div>
+    </div>
+    <div class="home-card c-game" onclick="goPage('games')">
+      <div class="home-card-ico">🎮</div>
+      <div class="home-card-name">Ігри</div>
+      <div class="home-card-desc">Матчинг, вгадай букву, час!</div>
+      <div class="home-card-prog"><div class="hcp-fill" id="hp-game" style="width:0%"></div></div>
+    </div>
+    <div class="home-card c-learn" onclick="goPage('flashcards')">
+      <div class="home-card-ico">🃏</div>
+      <div class="home-card-name">Флешкарти</div>
+      <div class="home-card-desc">Самостійне навчання</div>
+      <div class="home-card-prog"><div class="hcp-fill" id="hp-flash" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="section-hdr">
+    <div class="section-hdr-title">Слова дня</div>
+    <div class="section-hdr-link" onclick="renderDailyWords()">🔄 Оновити</div>
+  </div>
+  <div class="daily-words" id="dailyWords"></div>
+</div>
+
+<!-- LETTERS -->
+<div class="page" id="page-letters">
+  <div class="page-title">🔤 Алфавіт</div>
+  <div class="page-sub">Натискай букви — почуєш звучання. Зелені — вже вивчені!</div>
+
+  <div class="filter-bar">
+    <div class="fchip on" onclick="filterLetters('all',this)">Всі</div>
+    <div class="fchip" onclick="filterLetters('vowel',this)">Голосні 🔵</div>
+    <div class="fchip" onclick="filterLetters('consonant',this)">Приголосні 🔴</div>
+    <div class="fchip" onclick="filterLetters('done',this)">Вивчені ✅</div>
+    <div class="fchip" onclick="filterLetters('todo',this)">Ще не вивчені</div>
+  </div>
+
+  <div class="alphabet-grid" id="alphabetGrid"></div>
+</div>
+
+<!-- LETTER DETAIL -->
+<div class="page" id="page-letter-detail">
+  <button class="btn-full outline" style="margin-bottom:14px" onclick="goPage('letters')">← До алфавіту</button>
+  <div id="letterDetailInner"></div>
+</div>
+
+<!-- SYLLABLES -->
+<div class="page" id="page-syllables">
+  <div class="page-title">📖 Склади</div>
+  <div class="page-sub">Натисни на склад — почуєш вимову. Потім з'явиться перевірка!</div>
+  <div class="tip"><span class="tip-ico">💡</span><span>Склад = приголосна + голосна. Наприклад: <strong>МА</strong>, <strong>БО</strong>, <strong>РИ</strong>. Чуєш різницю?</span></div>
+  <div id="syllablesInner"></div>
+</div>
+
+<!-- WORDS -->
+<div class="page" id="page-words">
+  <div class="page-title">📚 Слова</div>
+  <div class="page-sub">Слова з твого світу — тисни 🔊 щоб почути!</div>
+  <div class="words-filter" id="wordsFilter"></div>
+  <div id="wordsInner"></div>
+</div>
+
+<!-- FLASHCARDS -->
+<div class="page" id="page-flashcards">
+  <div class="page-title">🃏 Флешкарти</div>
+  <div class="page-sub">Натисни на картку — побачиш відповідь. Вчись сам!</div>
+  <div class="fc-deck-select" id="fcDeckSelect"></div>
+  <div class="fc-progress-txt" id="fcProgressTxt">Картка <span>1</span> з <span>10</span></div>
+  <div class="flashcard-wrap" onclick="flipCard()">
+    <div class="flashcard" id="flashcard">
+      <div class="fc-front" id="fcFront">
+        <div class="fc-emoji" id="fc-emoji">🚗</div>
+        <div class="fc-main" id="fc-main">МАШИНА</div>
+        <div class="fc-sub" id="fc-sub">Що це? Натисни щоб дізнатися</div>
+        <div class="fc-hint">👆 Натисни на картку</div>
+      </div>
+      <div class="fc-back" id="fcBack">
+        <div class="fc-main" id="fc-back-main" style="font-size:28px;color:var(--text)">МАШИНА</div>
+        <div class="fc-syl" id="fc-back-syl">МА-ШИ-НА</div>
+        <div class="fc-sub" style="margin-top:10px" id="fc-back-sub">🔊 натисни нижче щоб почути</div>
+      </div>
+    </div>
+  </div>
+  <div class="fc-controls">
+    <div class="fc-btn repeat" onclick="fcAnswer(false)">❌ Ще раз</div>
+    <div class="fc-btn flip" onclick="fcSpeak()">🔊 Звук</div>
+    <div class="fc-btn know" onclick="fcAnswer(true)">✅ Знаю!</div>
+  </div>
+  <div class="progress-track" style="margin-bottom:10px">
+    <div class="progress-fill-bar" id="fcProgBar" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- QUIZ SELECT -->
+<div class="page" id="page-quiz-select">
+  <div class="page-title">⚡ Квіз</div>
+  <div class="page-sub">Вибери тип перевірки знань!</div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+    <div class="home-card c-letters" style="grid-column:span 1" onclick="startQuiz('letters')">
+      <div class="home-card-ico">🔤</div>
+      <div class="home-card-name">Квіз по буквах</div>
+      <div class="home-card-desc">15 питань про букви алфавіту</div>
+    </div>
+    <div class="home-card c-words" onclick="startQuiz('words')">
+      <div class="home-card-ico">🚗</div>
+      <div class="home-card-name">Квіз по словах</div>
+      <div class="home-card-desc">Почуй слово — знайди букву або слово</div>
+    </div>
+    <div class="home-card c-syllables" onclick="startQuiz('mixed')">
+      <div class="home-card-ico">🎯</div>
+      <div class="home-card-name">Мікс-квіз</div>
+      <div class="home-card-desc">Все разом: букви, склади, слова!</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="page" id="page-quiz">
+  <button class="btn-full outline" style="margin-bottom:14px;padding:10px" onclick="goPage('quiz-select')">← Вийти</button>
+  <div class="quiz-meta">
+    <div class="quiz-lives" id="qLives">❤️❤️❤️</div>
+    <div class="quiz-score-disp">XP: <span id="qScore">0</span></div>
+  </div>
+  <div class="quiz-prog-bar"><div class="quiz-prog-fill" id="qProgFill" style="width:0%"></div></div>
+  <div id="quizInner"></div>
+</div>
+
+<!-- GAMES -->
+<div class="page" id="page-games">
+  <div class="page-title">🎮 Ігри</div>
+  <div class="page-sub">Ігри роблять навчання крутим!</div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+    <div class="home-card c-game" onclick="startGame('match')">
+      <div class="home-card-ico">🔗</div>
+      <div class="home-card-name">Матч-гра</div>
+      <div class="home-card-desc">З'єднай слово з картинкою-емодзі за 60 секунд!</div>
+    </div>
+    <div class="home-card c-letters" onclick="startGame('fib')">
+      <div class="home-card-ico">❓</div>
+      <div class="home-card-name">Заповни букву</div>
+      <div class="home-card-desc">Є слово — пропущена буква. Знайди її!</div>
+    </div>
+    <div class="home-card c-quiz" onclick="startGame('sound')">
+      <div class="home-card-ico">🔊</div>
+      <div class="home-card-name">Звуковий челендж</div>
+      <div class="home-card-desc">Чуєш слово — вибираєш правильне написання!</div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME BOARD -->
+<div class="page" id="page-game-board">
+  <button class="btn-full outline" style="margin-bottom:14px;padding:10px" onclick="goPage('games')">← До ігор</button>
+  <div id="gameBoardInner"></div>
+</div>
+
+<!-- GAME RESULT -->
+<div class="page" id="page-game-result">
+  <div id="gameResultInner"></div>
+</div>
+
+<!-- QUIZ RESULT -->
+<div class="page" id="page-quiz-result">
+  <div id="quizResultInner"></div>
+</div>
+
+<!-- PARENT MODE -->
+<div class="page" id="page-parent">
+  <div class="page-title">👨‍👦 Режим батька</div>
+  <div class="page-sub">Стеж за прогресом і давай завдання</div>
+
+  <div class="missions-tabs" id="parentTabs">
+    <div class="mtab on" onclick="switchParentTab('stats',this)">📊 Статистика</div>
+    <div class="mtab" onclick="switchParentTab('missions',this)">🎯 Завдання</div>
+    <div class="mtab" onclick="switchParentTab('achievements',this)">🏆 Досягнення</div>
+  </div>
+
+  <!-- Stats panel -->
+  <div id="parentPanelStats">
+    <div class="parent-section">
+      <div class="parent-section-title">📊 Статистика</div>
+      <div class="parent-stat-grid" id="parentStats"></div>
+    </div>
+    <div class="parent-section">
+      <div class="parent-section-title">📈 Прогрес по розділах</div>
+      <div id="parentProgress"></div>
+    </div>
+  </div>
+
+  <!-- Missions panel -->
+  <div id="parentPanelMissions" style="display:none">
+    <div class="parent-section">
+      <div class="parent-section-title">🎯 Завдання для дитини</div>
+      <div class="tip"><span class="tip-ico">💡</span><span>Натисни на завдання щоб запустити його. Завдання відкриваються поступово!</span></div>
+      <div class="missions-grid" id="missionsList"></div>
+    </div>
+  </div>
+
+  <!-- Achievements panel -->
+  <div id="parentPanelAchievements" style="display:none">
+    <div class="parent-section">
+      <div class="parent-section-title">🏆 Досягнення</div>
+      <div class="ach-list" id="parentAch"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ACHIEVEMENTS -->
+<div class="page" id="page-achievements">
+  <div class="page-title">🏆 Досягнення</div>
+  <div class="page-sub">Збирай нагороди за прогрес!</div>
+  <div class="ach-list" id="achList"></div>
+</div>
+
+</div><!-- end app-body -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bn-item on" id="bn-home" onclick="goPage('home')">
+    <div class="bn-ico">🏠</div>
+    <div class="bn-lbl">Дім</div>
+  </div>
+  <div class="bn-item" id="bn-letters" onclick="goPage('letters')">
+    <div class="bn-ico">🔤</div>
+    <div class="bn-lbl">Букви</div>
+  </div>
+  <div class="bn-item" id="bn-words" onclick="goPage('words')">
+    <div class="bn-ico">📚</div>
+    <div class="bn-lbl">Слова</div>
+  </div>
+  <div class="bn-item" id="bn-quiz" onclick="goPage('quiz-select')">
+    <div class="bn-ico">⚡</div>
+    <div class="bn-lbl">Квіз</div>
+  </div>
+  <div class="bn-item" id="bn-games" onclick="goPage('games')">
+    <div class="bn-ico">🎮</div>
+    <div class="bn-lbl">Ігри</div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const VOWELS = new Set(['А','Е','И','І','Є','Ї','О','У','Ю','Я']);
+
+const ALPHABET = [
+  {l:'А',n:'а',type:'vowel',words:[{w:'АВТОМОБІЛЬ',e:'🚗'},{w:'АНТЕНА',e:'📡'},{w:'АКОРД',e:'🎸'}]},
+  {l:'Б',n:'бе',type:'consonant',words:[{w:'БАЙК',e:'🏍️'},{w:'БАС',e:'🎸'},{w:'БОЛТ',e:'🔩'}]},
+  {l:'В',n:'ве',type:'consonant',words:[{w:'ВІТЕР',e:'💨'},{w:'ВОГОНЬ',e:'🔥'},{w:'ВАНТАЖІВКА',e:'🚛'}]},
+  {l:'Г',n:'ге',type:'consonant',words:[{w:'ГОНКА',e:'🏁'},{w:'ГІТАРА',e:'🎸'},{w:'ГАРАЖ',e:'🏠'}]},
+  {l:'Ґ',n:'ґе',type:'consonant',words:[{w:'ҐРУНТ',e:'🌍'},{w:'ҐАНОК',e:'🏠'}]},
+  {l:'Д',n:'де',type:'consonant',words:[{w:'ДВИГУН',e:'⚙️'},{w:'ДИСК',e:'💿'},{w:'ДОРОГА',e:'🛣️'}]},
+  {l:'Е',n:'е',type:'vowel',words:[{w:'ЕКІПАЖ',e:'👥'},{w:'ЕФЕКТ',e:'✨'},{w:'ЕЛЕКТРИКА',e:'⚡'}]},
+  {l:'Є',n:'є',type:'vowel',words:[{w:'ЄНОТ',e:'🦝'},{w:'ЄДНІСТЬ',e:'🤝'}]},
+  {l:'Ж',n:'же',type:'consonant',words:[{w:'ЖЕСТ',e:'👋'},{w:'ЖУРНАЛ',e:'📰'},{w:'ЗАЛІЗО',e:'🔩'}]},
+  {l:'З',n:'зе',type:'consonant',words:[{w:'ЗВУК',e:'🔊'},{w:'ЗАПУСК',e:'🚀'},{w:'ЗАЛІЗО',e:'🔩'}]},
+  {l:'И',n:'и',type:'vowel',words:[{w:'ІКОНА',e:'✨'},{w:'ІНСТРУМЕНТ',e:'🔧'}]},
+  {l:'І',n:'і',type:'vowel',words:[{w:'ІМПУЛЬС',e:'⚡'},{w:'ІНСТРУМЕНТ',e:'🔧'},{w:'ІСКРА',e:'✨'}]},
+  {l:'Ї',n:'ї',type:'vowel',words:[{w:'ЇДА',e:'🍕'},{w:'ЇЗДА',e:'🚗'},{w:'ЇЖАК',e:'🦔'}]},
+  {l:'Й',n:'йот',type:'consonant',words:[{w:'ЙОГА',e:'🧘'},{w:'ЙОД',e:'💊'}]},
+  {l:'К',n:'ка',type:'consonant',words:[{w:'КОЛЕСО',e:'🛞'},{w:'КЛАПАН',e:'🔩'},{w:'КАРБЮРАТОР',e:'⚙️'}]},
+  {l:'Л',n:'ел',type:'consonant',words:[{w:'ЛІМУЗИН',e:'🚙'},{w:'ЛІНІЯ',e:'📏'},{w:'ЛІТАК',e:'✈️'}]},
+  {l:'М',n:'ем',type:'consonant',words:[{w:'МОТОР',e:'⚙️'},{w:'МОТО',e:'🏍️'},{w:'МУЗИКА',e:'🎵'}]},
+  {l:'Н',n:'ен',type:'consonant',words:[{w:'НОТА',e:'🎵'},{w:'НАСОС',e:'🔧'},{w:'НІТРО',e:'🔥'}]},
+  {l:'О',n:'о',type:'vowel',words:[{w:'ОЛІЯ',e:'🛢️'},{w:'ОБІД',e:'⚙️'},{w:'ОСНОВА',e:'🏗️'}]},
+  {l:'П',n:'пе',type:'consonant',words:[{w:'ПОРШЕНЬ',e:'⚙️'},{w:'ПЕДАЛЬ',e:'🦶'},{w:'ПІСНЯ',e:'🎤'}]},
+  {l:'Р',n:'ер',type:'consonant',words:[{w:'РИТМ',e:'🥁'},{w:'РЕСОРА',e:'🔧'},{w:'РУЛЬ',e:'🛞'}]},
+  {l:'С',n:'ес',type:'consonant',words:[{w:'СТЕРНО',e:'🚗'},{w:'СЦЕНА',e:'🎤'},{w:'СТАЛЬ',e:'⚙️'}]},
+  {l:'Т',n:'те',type:'consonant',words:[{w:'ТУРБІНА',e:'🔧'},{w:'ТРЕК',e:'🏎️'},{w:'ТЕМП',e:'🎵'}]},
+  {l:'У',n:'у',type:'vowel',words:[{w:'УДАР',e:'💥'},{w:'УСПІХ',e:'🏆'},{w:'УМОВА',e:'📋'}]},
+  {l:'Ф',n:'еф',type:'consonant',words:[{w:'ФІНАЛ',e:'🏁'},{w:'ФАРА',e:'💡'},{w:'ФРЕЗА',e:'⚙️'}]},
+  {l:'Х',n:'ха',type:'consonant',words:[{w:'ХРОМ',e:'✨'},{w:'ХІД',e:'🚗'},{w:'ХІТ',e:'🎵'}]},
+  {l:'Ц',n:'це',type:'consonant',words:[{w:'ЦИЛІНДР',e:'⚙️'},{w:'ЦИКЛ',e:'🔄'},{w:'ЦІНЬ',e:'💥'}]},
+  {l:'Ч',n:'че',type:'consonant',words:[{w:'ЧЕМПІОН',e:'🏆'},{w:'ЧІП',e:'💾'},{w:'ЧОРНИЙ',e:'⚫'}]},
+  {l:'Ш',n:'ша',type:'consonant',words:[{w:'ШИНА',e:'🛞'},{w:'ШЕСТЕРНЯ',e:'⚙️'},{w:'ШОУ',e:'🎤'}]},
+  {l:'Щ',n:'ща',type:'consonant',words:[{w:'ЩИТОК',e:'🛡️'},{w:'ЩІЛЬНИЙ',e:'💪'}]},
+  {l:'Ь',n:'мʼякий знак',type:'consonant',words:[{w:'СТАЛЬ',e:'⚙️'},{w:'НІЧ',e:'🌙'}]},
+  {l:'Ю',n:'ю',type:'vowel',words:[{w:'ЮНАК',e:'👦'},{w:'ЯМАХА',e:'🏍️'}]},
+  {l:'Я',n:'я',type:'vowel',words:[{w:'ЯКІР',e:'⚓'},{w:'ЯСКРАВИЙ',e:'✨'},{w:'ЯМАХА',e:'🏍️'}]},
+];
+
+const SYLLABLES = [
+  {group:'МА МО МУ МИ МЕ МІ',items:['МА','МО','МУ','МИ','МЕ','МІ']},
+  {group:'БА БО БУ БИ БЕ БІ',items:['БА','БО','БУ','БИ','БЕ','БІ']},
+  {group:'РА РО РУ РИ РЕ РІ',items:['РА','РО','РУ','РИ','РЕ','РІ']},
+  {group:'ТА ТО ТУ ТИ ТЕ ТІ',items:['ТА','ТО','ТУ','ТИ','ТЕ','ТІ']},
+  {group:'КА КО КУ КИ КЕ КІ',items:['КА','КО','КУ','КИ','КЕ','КІ']},
+  {group:'ГА ГО ГУ ГИ ГЕ ГІ',items:['ГА','ГО','ГУ','ГИ','ГЕ','ГІ']},
+  {group:'ДА ДО ДУ ДИ ДЕ ДІ',items:['ДА','ДО','ДУ','ДИ','ДЕ','ДІ']},
+  {group:'НА НО НУ НИ НЕ НІ',items:['НА','НО','НУ','НИ','НЕ','НІ']},
+  {group:'ЛА ЛО ЛУ ЛИ ЛЕ ЛІ',items:['ЛА','ЛО','ЛУ','ЛИ','ЛЕ','ЛІ']},
+  {group:'СА СО СУ СИ СЕ СІ',items:['СА','СО','СУ','СИ','СЕ','СІ']},
+  {group:'ВА ВО ВУ ВИ ВЕ ВІ',items:['ВА','ВО','ВУ','ВИ','ВЕ','ВІ']},
+  {group:'ЗА ЗО ЗУ ЗИ ЗЕ ЗІ',items:['ЗА','ЗО','ЗУ','ЗИ','ЗЕ','ЗІ']},
+  {group:'ПА ПО ПУ ПИ ПЕ ПІ',items:['ПА','ПО','ПУ','ПИ','ПЕ','ПІ']},
+  {group:'ФА ФО ФУ ФИ ФЕ ФІ',items:['ФА','ФО','ФУ','ФИ','ФЕ','ФІ']},
+  {group:'ХА ХО ХУ ХИ ХЕ ХІ',items:['ХА','ХО','ХУ','ХИ','ХЕ','ХІ']},
+  {group:'ЧА ЧО ЧУ ЧИ ЧЕ ЧІ',items:['ЧА','ЧО','ЧУ','ЧИ','ЧЕ','ЧІ']},
+  {group:'ША ШО ШУ ШИ ШЕ ШІ',items:['ША','ШО','ШУ','ШИ','ШЕ','ШІ']},
+  {group:'ЖА ЖО ЖУ ЖИ ЖЕ ЖІ',items:['ЖА','ЖО','ЖУ','ЖИ','ЖЕ','ЖІ']},
+  {group:'ЦА ЦО ЦУ ЦИ ЦЕ ЦІ',items:['ЦА','ЦО','ЦУ','ЦИ','ЦЕ','ЦІ']},
+  {group:'ЩА ЩО ЩУ ЩИ ЩЕ ЩІ',items:['ЩА','ЩО','ЩУ','ЩИ','ЩЕ','ЩІ']},
+];
+
+const WORDS_DB = [
+  {cat:'🏎️ Машини',id:'cars',words:[
+    {w:'МАШИНА',s:'МА-ШИ-НА',e:'🚗'},{w:'ГОНКА',s:'ГОН-КА',e:'🏁'},
+    {w:'ДВИГУН',s:'ДВИ-ГУН',e:'⚙️'},{w:'КОЛЕСО',s:'КО-ЛЕ-СО',e:'🛞'},
+    {w:'МОТОР',s:'МО-ТОР',e:'🔧'},{w:'БЕНЗИН',s:'БЕН-ЗИН',e:'⛽'},
+    {w:'ГАРАЖ',s:'ГА-РАЖ',e:'🏠'},{w:'ШВИДКО',s:'ШВИД-КО',e:'💨'},
+    {w:'ДОРОГА',s:'ДО-РО-ГА',e:'🛣️'},{w:'РУЛЬ',s:'РУЛЬ',e:'🛞'},
+    {w:'ФАРА',s:'ФА-РА',e:'💡'},{w:'ТРАСА',s:'ТРА-СА',e:'🛣️'},
+    {w:'КУЗОВ',s:'КУ-ЗОВ',e:'🚗'},{w:'ТУРБІНА',s:'ТУР-БІ-НА',e:'🌀'},
+    {w:'НІТРО',s:'НІТ-РО',e:'🔥'},{w:'КАПОТ',s:'КА-ПОТ',e:'🚘'},
+    {w:'БАГАЖНИК',s:'БА-ГАЖ-НИК',e:'🧳'},{w:'ПЕДАЛЬ',s:'ПЕ-ДАЛЬ',e:'🦶'},
+    {w:'ШИНА',s:'ШИ-НА',e:'🛞'},{w:'ПАЛЬНЕ',s:'ПАЛЬ-НЕ',e:'⛽'},
+  ]},
+  {cat:'🏍️ Мотоцикли',id:'moto',words:[
+    {w:'МОТО',s:'МО-ТО',e:'🏍️'},{w:'БАЙК',s:'БАЙК',e:'🏍️'},
+    {w:'ШОЛОМ',s:'ШО-ЛОМ',e:'⛑️'},{w:'ТРАСА',s:'ТРА-СА',e:'🛣️'},
+    {w:'СТРИБОК',s:'СТРИ-БОК',e:'💥'},{w:'ПІДВІСКА',s:'ПІД-ВІС-КА',e:'🔧'},
+    {w:'ЗЛАМ',s:'ЗЛАМ',e:'💥'},{w:'ЛАНЦЮГ',s:'ЛАН-ЦЮГ',e:'🔗'},
+    {w:'КЛАПАН',s:'КЛА-ПАН',e:'🔩'},{w:'СПИЦЯ',s:'СПИ-ЦЯ',e:'🛞'},
+    {w:'ВИЛКИ',s:'ВИЛ-КИ',e:'🔧'},{w:'ГЛУШНИК',s:'ГЛУШ-НИК',e:'💨'},
+  ]},
+  {cat:'🎵 Музика',id:'music',words:[
+    {w:'МУЗИКА',s:'МУ-ЗИ-КА',e:'🎵'},{w:'РИТМ',s:'РИТМ',e:'🥁'},
+    {w:'ГІТАРА',s:'ГІ-ТА-РА',e:'🎸'},{w:'БАС',s:'БАС',e:'🎸'},
+    {w:'ПІСНЯ',s:'ПІС-НЯ',e:'🎤'},{w:'ЗВУК',s:'ЗВУК',e:'🔊'},
+    {w:'ТРЕК',s:'ТРЕК',e:'💿'},{w:'АКОРД',s:'А-КОРД',e:'🎸'},
+    {w:'СТУДІЯ',s:'СТУ-ДІ-Я',e:'🎙️'},{w:'МІКРОФОН',s:'МІК-РО-ФОН',e:'🎤'},
+    {w:'КОЛОНКА',s:'КО-ЛОН-КА',e:'📢'},{w:'БАРАБАН',s:'БА-РА-БАН',e:'🥁'},
+    {w:'МЕЛОДІЯ',s:'МЕ-ЛО-ДІ-Я',e:'🎼'},{w:'КОНЦЕРТ',s:'КОН-ЦЕРТ',e:'🎪'},
+    {w:'НОТИ',s:'НО-ТИ',e:'🎼'},{w:'СИНТЕЗ',s:'СИН-ТЕЗ',e:'🎹'},
+    {w:'АЛЬБОМ',s:'АЛЬ-БОМ',e:'💿'},{w:'СЦЕНА',s:'СЦЕ-НА',e:'🎭'},
+  ]},
+  {cat:'🌍 Природа',id:'nature',words:[
+    {w:'СОНЦЕ',s:'СОН-ЦЕ',e:'☀️'},{w:'ВОДА',s:'ВО-ДА',e:'💧'},
+    {w:'ВОГОНЬ',s:'ВО-ГОНЬ',e:'🔥'},{w:'ВІТЕР',s:'ВІ-ТЕР',e:'💨'},
+    {w:'ГОРА',s:'ГО-РА',e:'⛰️'},{w:'ЛІС',s:'ЛІС',e:'🌲'},
+    {w:'НЕБО',s:'НЕ-БО',e:'🌤️'},{w:'ЗЕМЛЯ',s:'ЗЕМ-ЛЯ',e:'🌍'},
+    {w:'ДЕРЕВО',s:'ДЕ-РЕ-ВО',e:'🌳'},{w:'КВІТКА',s:'КВІТ-КА',e:'🌸'},
+    {w:'РІЧКА',s:'РІЧ-КА',e:'🏞️'},{w:'МОРЕ',s:'МО-РЕ',e:'🌊'},
+    {w:'ХМАРА',s:'ХМА-РА',e:'☁️'},{w:'ДОЩ',s:'ДОЩ',e:'🌧️'},
+    {w:'СНІГ',s:'СНІГ',e:'❄️'},{w:'КАМІНЬ',s:'КА-МІНЬ',e:'🪨'},
+  ]},
+  {cat:'🍕 Їжа',id:'food',words:[
+    {w:'ПІЦА',s:'ПІ-ЦА',e:'🍕'},{w:'БОРЩ',s:'БОРЩ',e:'🍲'},
+    {w:'ХЛІБ',s:'ХЛІБ',e:'🍞'},{w:'САЛО',s:'СА-ЛО',e:'🥩'},
+    {w:'СУП',s:'СУП',e:'🍜'},{w:'КАША',s:'КА-ША',e:'🥣'},
+    {w:'ТОРТ',s:'ТОРТ',e:'🎂'},{w:'ЦУКОР',s:'ЦУ-КОР',e:'🍬'},
+    {w:'ЯБЛУКО',s:'ЯБ-ЛУ-КО',e:'🍎'},{w:'БАНАН',s:'БА-НАН',e:'🍌'},
+    {w:'МОЛОКО',s:'МО-ЛО-КО',e:'🥛'},{w:'МАСЛО',s:'МАС-ЛО',e:'🧈'},
+    {w:'СІЛЬ',s:'СІЛЬ',e:'🧂'},{w:'МОРОЗИВО',s:'МО-РО-ЗИ-ВО',e:'🍦'},
+    {w:'ВИШНЯ',s:'ВИШ-НЯ',e:'🍒'},{w:'ГРИБ',s:'ГРИБ',e:'🍄'},
+  ]},
+  {cat:'🏠 Дім і місто',id:'city',words:[
+    {w:'МІСТО',s:'МІС-ТО',e:'🏙️'},{w:'ШКОЛА',s:'ШКО-ЛА',e:'🏫'},
+    {w:'ВУЛИЦЯ',s:'ВУ-ЛИ-ЦЯ',e:'🛣️'},{w:'БУДИНОК',s:'БУ-ДИ-НОК',e:'🏠'},
+    {w:'МАГАЗИН',s:'МА-ГА-ЗИН',e:'🛒'},{w:'ПАРК',s:'ПАРК',e:'🌳'},
+    {w:'МІСТ',s:'МІСТ',e:'🌉'},{w:'ЗАВОД',s:'ЗА-ВОД',e:'🏭'},
+    {w:'ПЛОЩА',s:'ПЛО-ЩА',e:'🏛️'},{w:'СТАДІОН',s:'СТА-ДІ-ОН',e:'🏟️'},
+    {w:'ВІКНО',s:'ВІК-НО',e:'🪟'},{w:'ДВЕРІ',s:'ДВЕ-РІ',e:'🚪'},
+    {w:'ЛІЖКО',s:'ЛІЖ-КО',e:'🛏️'},{w:'СТІЛ',s:'СТІЛ',e:'🪑'},
+    {w:'КІМНАТА',s:'КІМ-НА-ТА',e:'🏠'},{w:'СХОДИ',s:'СХО-ДИ',e:'🪜'},
+  ]},
+  {cat:'💪 Спорт',id:'sport',words:[
+    {w:'ФУТБОЛ',s:'ФУТ-БОЛ',e:'⚽'},{w:'БОКС',s:'БОКС',e:'🥊'},
+    {w:'БІГ',s:'БІГ',e:'🏃'},{w:'СТРИБОК',s:'СТРИ-БОК',e:'🦘'},
+    {w:'УДАР',s:'У-ДАР',e:'💥'},{w:'ПЕРЕМОГА',s:'ПЕ-РЕ-МО-ГА',e:'🏆'},
+    {w:'КОМАНДА',s:'КО-МАН-ДА',e:'👥'},{w:'ЧЕМПІОН',s:'ЧЕМ-ПІ-ОН',e:'🥇'},
+    {w:'РЕКОРД',s:'РЕ-КОРД',e:'📈'},{w:'ТРЕНІНГ',s:'ТРЕ-НІН',e:'🏋️'},
+    {w:'М\'ЯЧ',s:'М\'ЯЧ',e:'⚽'},{w:'ВОРОТА',s:'ВО-РО-ТА',e:'🥅'},
+    {w:'ТРЕНЕР',s:'ТРЕ-НЕР',e:'👨‍🏫'},{w:'СПОРТ',s:'СПОРТ',e:'🏅'},
+    {w:'КУБОК',s:'КУ-БОК',e:'🏆'},{w:'ФІНАЛ',s:'ФІ-НАЛ',e:'🏁'},
+  ]},
+  {cat:'⚙️ Техніка',id:'tech',words:[
+    {w:'ТЕЛЕФОН',s:'ТЕ-ЛЕ-ФОН',e:'📱'},{w:'КОМПЮТЕР',s:'КОМ-ПЮ-ТЕР',e:'💻'},
+    {w:'РОБОТ',s:'РО-БОТ',e:'🤖'},{w:'БАТАРЕЯ',s:'БА-ТА-РЕ-Я',e:'🔋'},
+    {w:'ДРОН',s:'ДРОН',e:'🚁'},{w:'РАКЕТА',s:'РА-КЕ-ТА',e:'🚀'},
+    {w:'ЛАЗЕР',s:'ЛА-ЗЕР',e:'🔴'},{w:'КАМЕРА',s:'КА-МЕ-РА',e:'📷'},
+    {w:'ЕКРАН',s:'ЕК-РАН',e:'📺'},{w:'КЛАВІША',s:'КЛА-ВІ-ША',e:'⌨️'},
+    {w:'МИШКА',s:'МИШ-КА',e:'🖱️'},{w:'ДИСК',s:'ДИСК',e:'💿'},
+    {w:'КАБЕЛЬ',s:'КА-БЕЛЬ',e:'🔌'},{w:'ЧІПСЕТ',s:'ЧІП-СЕТ',e:'💾'},
+  ]},
+  {cat:'🐾 Тварини',id:'animals',words:[
+    {w:'КІТ',s:'КІТ',e:'🐱'},{w:'ПЕС',s:'ПЕС',e:'🐶'},
+    {w:'КІНЬ',s:'КІНЬ',e:'🐴'},{w:'ТИГР',s:'ТИГР',e:'🐯'},
+    {w:'ЛИСИЦЯ',s:'ЛИ-СИ-ЦЯ',e:'🦊'},{w:'ВОВК',s:'ВОВК',e:'🐺'},
+    {w:'ВЕДМІДЬ',s:'ВЕД-МІДЬ',e:'🐻'},{w:'ОРЕЛ',s:'О-РЕЛ',e:'🦅'},
+    {w:'АКУЛА',s:'А-КУ-ЛА',e:'🦈'},{w:'ЖИРАФ',s:'ЖИ-РАФ',e:'🦒'},
+    {w:'ЗМІЯ',s:'ЗМІ-Я',e:'🐍'},{w:'ЧЕРЕПАХА',s:'ЧЕ-РЕ-ПА-ХА',e:'🐢'},
+    {w:'ДЕЛЬФІН',s:'ДЕЛЬ-ФІН',e:'🐬'},{w:'ПІНГВІН',s:'ПІН-ГВІН',e:'🐧'},
+    {w:'ПАВУК',s:'ПА-ВУК',e:'🕷️'},{w:'КРОЛИК',s:'КРО-ЛИК',e:'🐰'},
+  ]},
+  {cat:'👕 Одяг',id:'clothes',words:[
+    {w:'ФУТБОЛКА',s:'ФУТ-БОЛ-КА',e:'👕'},{w:'КУРТКА',s:'КУРТ-КА',e:'🧥'},
+    {w:'ДЖИНСИ',s:'ДЖИН-СИ',e:'👖'},{w:'КРОСІВКИ',s:'КРО-СІВ-КИ',e:'👟'},
+    {w:'ШАПКА',s:'ШАП-КА',e:'🧢'},{w:'РУКАВИЦІ',s:'РУ-КА-ВИ-ЦІ',e:'🧤'},
+    {w:'ШАРФ',s:'ШАРФ',e:'🧣'},{w:'СВЕТР',s:'СВЕТР',e:'🧶'},
+  ]},
+];
+
+const ALL_WORDS = WORDS_DB.flatMap(c => c.words.map(w => ({...w, cat: c.cat})));
+
+const ACHIEVEMENTS = [
+  {id:'first_letter',ico:'🔤',name:'Перша буква',desc:'Вивчи свою першу букву',check:s => s.learnedLetters.length >= 1},
+  {id:'five_letters',ico:'🔥',name:'5 букв',desc:'Вивчи 5 букв',check:s => s.learnedLetters.length >= 5},
+  {id:'ten_letters',ico:'💪',name:'10 букв',desc:'Вивчи 10 букв',check:s => s.learnedLetters.length >= 10},
+  {id:'half_alphabet',ico:'⭐',name:'Половина алфавіту',desc:'Вивчи 17+ букв',check:s => s.learnedLetters.length >= 17},
+  {id:'full_alphabet',ico:'🏆',name:'Весь алфавіт',desc:'Вивчи всі букви',check:s => s.learnedLetters.length >= ALPHABET.length},
+  {id:'first_syllable',ico:'📖',name:'Перший склад',desc:'Вивчи свій перший склад',check:s => s.learnedSyllables.length >= 1},
+  {id:'ten_syllables',ico:'📚',name:'10 складів',desc:'Вивчи 10 складів',check:s => s.learnedSyllables.length >= 10},
+  {id:'first_word',ico:'🚗',name:'Перше слово',desc:'Вивчи своє перше слово',check:s => s.learnedWords.length >= 1},
+  {id:'ten_words',ico:'🏎️',name:'10 слів',desc:'Вивчи 10 слів',check:s => s.learnedWords.length >= 10},
+  {id:'thirty_words',ico:'🌟',name:'30 слів',desc:'Вивчи 30 слів',check:s => s.learnedWords.length >= 30},
+  {id:'quiz_one',ico:'⚡',name:'Перший квіз',desc:'Пройди свій перший квіз',check:s => s.totalQuizzes >= 1},
+  {id:'quiz_three',ico:'🎯',name:'3 квізи',desc:'Пройди 3 квізи',check:s => s.totalQuizzes >= 3},
+  {id:'xp100',ico:'💯',name:'100 XP',desc:'Набери 100 XP',check:s => s.xp >= 100},
+  {id:'xp500',ico:'🚀',name:'500 XP',desc:'Набери 500 XP',check:s => s.xp >= 500},
+  {id:'streak3',ico:'🔥',name:'Серія 3 дні',desc:'Займайся 3 дні поспіль',check:s => s.streak >= 3},
+  {id:'game_one',ico:'🎮',name:'Перша гра',desc:'Зіграй в будь-яку гру',check:s => s.totalGames >= 1},
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let S = {
+  xp: 0, streak: 0,
+  learnedLetters: [], learnedSyllables: [], learnedWords: [],
+  totalQuizzes: 0, totalGames: 0, quizBest: 0,
+  theme: 'dark',
+  lastPage: 'home',
+};
+
+function loadS(){
+  try{
+    const d = localStorage.getItem('ukrboost_v2');
+    if(d) S = {...S, ...JSON.parse(d)};
+  } catch(e){}
+}
+function saveS(){
+  try{ localStorage.setItem('ukrboost_v2', JSON.stringify(S)); } catch(e){}
+}
+function clearAll(){
+  localStorage.removeItem('ukrboost_v2');
+  location.reload();
+}
+
+/* ============================================================
+   SPEECH
+   ============================================================ */
+function speak(text){
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'uk-UA';
+  u.rate = 0.82;
+  u.pitch = 1.05;
+  const voices = window.speechSynthesis.getVoices();
+  const ukV = voices.find(v => v.lang === 'uk-UA' || v.lang.startsWith('uk'));
+  if(ukV) u.voice = ukV;
+  window.speechSynthesis.speak(u);
+}
+if(window.speechSynthesis.onvoiceschanged !== undefined)
+  window.speechSynthesis.onvoiceschanged = () => {};
+
+/* ============================================================
+   XP & UI UPDATE
+   ============================================================ */
+function addXP(n, tag=''){
+  S.xp += n; saveS(); updateUI();
+  showToast(`+${n} XP ${tag}`);
+  checkAchievements();
+}
+
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className = 'xp-toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 1700);
+}
+
+function getRank(){
+  if(S.xp < 50) return '🔰 Новачок';
+  if(S.xp < 200) return '🥉 Учень';
+  if(S.xp < 500) return '🥈 Знавець';
+  if(S.xp < 1000) return '🥇 Профі';
+  if(S.xp < 2000) return '💎 Чемпіон';
+  return '🏆 Легенда';
+}
+
+function updateUI(){
+  document.getElementById('topXP').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+
+  // Sidebar
+  document.getElementById('sb-rank').textContent = getRank();
+  document.getElementById('sb-letters').textContent = S.learnedLetters.length;
+  document.getElementById('sb-syllables').textContent = S.learnedSyllables.length;
+  document.getElementById('sb-words-stat').textContent = S.learnedWords.length;
+
+  const levels = [50,200,500,1000,2000];
+  const next = levels.find(l => l > S.xp) || 2000;
+  const prev = levels[levels.indexOf(next)-1] || 0;
+  const pct = Math.min(100, Math.round(((S.xp-prev)/(next-prev))*100));
+  document.getElementById('sb-xp-bar').style.width = pct + '%';
+  document.getElementById('sb-xp-txt').textContent = S.xp + ' / ' + next + ' XP';
+
+  // Progress bars
+  const lPct = Math.round((S.learnedLetters.length / ALPHABET.length)*100);
+  const sPct = Math.round((S.learnedSyllables.length / 120)*100);
+  const totalW = ALL_WORDS.length;
+  const wPct = Math.round((S.learnedWords.length / totalW)*100);
+  const overall = Math.round((lPct + sPct + wPct) / 3);
+
+  document.getElementById('hp-letters').style.width = lPct + '%';
+  document.getElementById('hp-syl').style.width = sPct + '%';
+  document.getElementById('hp-words').style.width = wPct + '%';
+  document.getElementById('overallFill').style.width = overall + '%';
+  document.getElementById('overallPct').textContent = overall + '%';
+}
+
+/* ============================================================
+   PAGE NAVIGATION
+   ============================================================ */
+let currentPage = 'home';
+const bnMap = {
+  'home':'home','letters':'letters','words':'words',
+  'quiz-select':'quiz','quiz':'quiz','games':'games',
+  'syllables':null,'flashcards':null,'parent':null,'achievements':null,
+  'letter-detail':null,'quiz-result':null,'game-board':null,'game-result':null,
+};
+
+function goPage(id){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if(!pg) return;
+  pg.classList.add('active');
+  pg.scrollTop = 0;
+  currentPage = id;
+  S.lastPage = id;
+  saveS();
+
+  // bottom nav highlight
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('on'));
+  const bnKey = bnMap[id];
+  if(bnKey){
+    const bn = document.getElementById('bn-' + bnKey);
+    if(bn) bn.classList.add('on');
+  }
+
+  // sidebar highlight
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  const sbi = document.getElementById('sbi-' + id.replace('-select','').replace('-board',''));
+  if(sbi) sbi.classList.add('active');
+
+  closeSidebar();
+
+  // Render content
+  if(id === 'home') renderHome();
+  if(id === 'letters') renderLetters();
+  if(id === 'syllables') renderSyllables();
+  if(id === 'words') renderWords();
+  if(id === 'flashcards') initFlashcards();
+  if(id === 'parent') renderParent();
+  if(id === 'achievements') renderAchievements();
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+function toggleSidebar(){
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebarOverlay');
+  const btn = document.getElementById('menuBtn');
+  const isOpen = sb.classList.contains('open');
+  sb.classList.toggle('open', !isOpen);
+  ov.classList.toggle('show', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+  document.getElementById('menuBtn').classList.remove('open');
+}
+
+/* ============================================================
+   THEME
+   ============================================================ */
+function toggleTheme(){
+  S.theme = S.theme === 'dark' ? 'light' : 'dark';
+  applyTheme();
+  saveS();
+}
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', S.theme);
+  const isDark = S.theme === 'dark';
+  document.getElementById('themeToggle').classList.toggle('on', !isDark);
+  document.getElementById('theme-ico').textContent = isDark ? '🌙' : '☀️';
+  document.getElementById('theme-lbl').textContent = isDark ? 'Темна тема' : 'Світла тема';
+}
+
+/* ============================================================
+   HOME
+   ============================================================ */
+function renderHome(){
+  updateUI();
+  renderDailyWords();
+}
+function renderDailyWords(){
+  const all = [...ALL_WORDS].sort(() => Math.random()-.5).slice(0, 5);
+  document.getElementById('dailyWords').innerHTML = all.map(w => `
+    <div class="daily-word-row" onclick="speak('${w.w}')">
+      <div class="dwr-emoji">${w.e}</div>
+      <div class="dwr-text">
+        <div class="dwr-uk">${w.w}</div>
+        <div class="dwr-syl">${w.s}</div>
+      </div>
+      <button class="dwr-sound" onclick="event.stopPropagation();speak('${w.w}')">🔊</button>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   LETTERS PAGE
+   ============================================================ */
+let letterFilter = 'all';
+function renderLetters(filter){
+  if(filter) letterFilter = filter;
+  let items = [...ALPHABET];
+  if(letterFilter === 'vowel') items = items.filter(a => a.type === 'vowel');
+  if(letterFilter === 'consonant') items = items.filter(a => a.type === 'consonant');
+  if(letterFilter === 'done') items = items.filter(a => S.learnedLetters.includes(a.l));
+  if(letterFilter === 'todo') items = items.filter(a => !S.learnedLetters.includes(a.l));
+
+  document.getElementById('alphabetGrid').innerHTML = items.map((a, i) => {
+    const idx = ALPHABET.indexOf(a);
+    const done = S.learnedLetters.includes(a.l);
+    return `<div class="ltr-tile ${done?'done':''} ${a.type==='vowel'?'vowel':''}"
+               onclick="showLetterDetail(${idx})">
+      <div class="big">${a.l}</div>
+      <div class="sm">${a.n}</div>
+      ${done?'<div class="ck">✓</div>':''}
+    </div>`;
+  }).join('');
+}
+
+function filterLetters(f, el){
+  document.querySelectorAll('.filter-bar .fchip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  renderLetters(f);
+}
+
+function showLetterDetail(idx){
+  const a = ALPHABET[idx];
+  speak(a.n);
+  const opts = genOpts4(a.l);
+
+  document.getElementById('letterDetailInner').innerHTML = `
+    <div class="ltr-detail-header">
+      <div class="ltr-giant">${a.l}</div>
+      <div class="ltr-name-label">"${a.n}" · ${a.l.toLowerCase()} · ${a.type === 'vowel' ? '🔵 Голосна' : '🔴 Приголосна'}</div>
+      <button class="btn-speak" onclick="speak('${a.n}')">🔊 Послухати</button>
+    </div>
+
+    <div class="examples-card">
+      <div class="examples-card-title">🚗 Слова з буквою "${a.l}"</div>
+      ${a.words.map(wr => {
+        const hl = wr.w.replace(new RegExp(a.l,'gi'), m => `<span class="hl">${m}</span>`);
+        return `<div class="ex-word" onclick="speak('${wr.w}')">
+          <div class="ex-word-txt">${hl}</div>
+          <div class="ex-word-ico">${wr.e}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="mini-quiz-card">
+      <div class="mq-q">❓ Яка це буква? (почуй і вибери)</div>
+      <div class="mq-grid" id="mqGrid">
+        ${opts.map(o => `<div class="mq-opt" onclick="checkMQ(this,'${o}','${a.l}',${idx})">${o}</div>`).join('')}
+      </div>
+      <div class="mq-feedback" id="mqFb"></div>
+    </div>
+
+    <button class="btn-full" onclick="markLetterDone('${a.l}');goPage('letters')">✅ Запам'ятав — далі!</button>
+  `;
+  goPage('letter-detail');
+}
+
+function genOpts4(correct){
+  const all = ALPHABET.map(a => a.l);
+  const wrong = all.filter(l => l !== correct).sort(() => .5-Math.random()).slice(0,3);
+  return [...wrong, correct].sort(() => .5-Math.random());
+}
+
+function checkMQ(el, chosen, correct, idx){
+  document.querySelectorAll('#mqGrid .mq-opt').forEach(o => o.classList.add('dis'));
+  const fb = document.getElementById('mqFb');
+  if(chosen === correct){
+    el.classList.add('ok');
+    fb.style.color = 'var(--green)';
+    fb.textContent = '✅ Правильно! +10 XP';
+    addXP(10, '🔤');
+    markLetterDone(correct);
+  } else {
+    el.classList.add('no');
+    document.querySelectorAll('#mqGrid .mq-opt').forEach(o => {
+      if(o.textContent.trim() === correct) o.classList.add('ok');
+    });
+    fb.style.color = 'var(--red)';
+    fb.textContent = `❌ Ні. Правильно — ${correct}`;
+  }
+  speak(chosen === correct ? 'Правильно' : 'Спробуй ще раз');
+}
+
+function markLetterDone(l){
+  if(!S.learnedLetters.includes(l)){
+    S.learnedLetters.push(l);
+    saveS(); updateUI();
+  }
+}
+
+/* ============================================================
+   SYLLABLES
+   ============================================================ */
+function renderSyllables(){
+  document.getElementById('syllablesInner').innerHTML = `
+    <div class="syl-groups">
+      ${SYLLABLES.map(gr => `
+        <div>
+          <div class="syl-group-title">${gr.group}</div>
+          <div class="syl-grid">
+            ${gr.items.map(s => {
+              const done = S.learnedSyllables.includes(s);
+              return `<div class="syl-tile ${done?'done':''}" onclick="onSyl('${s}')">
+                <div class="syl-tile-txt">${s}</div>
+                <div class="syl-tile-sub">${done ? '✓ вивчено' : '▶ почути'}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+function onSyl(s){
+  speak(s);
+  if(!S.learnedSyllables.includes(s)){
+    S.learnedSyllables.push(s);
+    addXP(5,'📖');
+    saveS();
+    setTimeout(renderSyllables, 300);
+  }
+}
+
+/* ============================================================
+   WORDS
+   ============================================================ */
+let wordFilter = 'all';
+function renderWords(){
+  // filter chips
+  const filterDiv = document.getElementById('wordsFilter');
+  filterDiv.innerHTML = `<div class="fchip ${wordFilter==='all'?'on':''}" onclick="filterWords('all',this)">Всі</div>` +
+    WORDS_DB.map(c => `<div class="fchip ${wordFilter===c.id?'on':''}" onclick="filterWords('${c.id}',this)">${c.cat.split(' ')[0]} ${c.cat.split(' ').slice(1).join(' ')}</div>`).join('');
+
+  const cats = wordFilter === 'all' ? WORDS_DB : WORDS_DB.filter(c => c.id === wordFilter);
+  document.getElementById('wordsInner').innerHTML = cats.map(cat => `
+    <div class="word-categories">
+      <div class="wcat-header">
+        <div class="wcat-ico">${cat.cat.split(' ')[0]}</div>
+        <div class="wcat-name">${cat.cat.split(' ').slice(1).join(' ')}</div>
+      </div>
+      ${cat.words.map(wr => {
+        const done = S.learnedWords.includes(wr.w);
+        return `<div class="word-item ${done?'learned':''}" onclick="speak('${wr.w}')">
+          <div class="wi-emoji">${wr.e}</div>
+          <div class="wi-info">
+            <div class="wi-uk">${wr.w}</div>
+            <div class="wi-syl">${wr.s}</div>
+          </div>
+          <div class="wi-actions">
+            <div class="ibi snd" onclick="event.stopPropagation();speak('${wr.w}')">🔊</div>
+            <div class="ibi chk ${done?'on':''}" onclick="event.stopPropagation();markWordDone('${wr.w}')">
+              ${done ? '✅' : '☐'}
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+}
+function filterWords(id, el){
+  wordFilter = id;
+  document.querySelectorAll('.words-filter .fchip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  renderWords();
+}
+function markWordDone(w){
+  if(!S.learnedWords.includes(w)){
+    S.learnedWords.push(w);
+    addXP(15,'🚗');
+    saveS();
+  }
+  renderWords();
+}
+
+/* ============================================================
+   FLASHCARDS
+   ============================================================ */
+let fcDeck = 'cars';
+let fcCards = [];
+let fcIdx = 0;
+let fcKnown = 0;
+let fcFlipped = false;
+
+const DECKS = [
+  {id:'all', label:'Всі слова'},
+  ...WORDS_DB.map(c => ({id:c.id, label:c.cat.split(' ').slice(1).join(' ')}))
+];
+
+function initFlashcards(){
+  // deck chips
+  document.getElementById('fcDeckSelect').innerHTML = DECKS.map(d =>
+    `<div class="deck-chip ${fcDeck===d.id?'on':''}" onclick="setFCDeck('${d.id}',this)">${d.label}</div>`
+  ).join('');
+  buildFCDeck();
+}
+
+function setFCDeck(id, el){
+  fcDeck = id;
+  document.querySelectorAll('.deck-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  buildFCDeck();
+}
+
+function buildFCDeck(){
+  const src = fcDeck === 'all' ? ALL_WORDS : WORDS_DB.find(c => c.id === fcDeck)?.words || ALL_WORDS;
+  fcCards = [...src].sort(() => Math.random()-.5);
+  fcIdx = 0; fcKnown = 0; fcFlipped = false;
+  renderFC();
+}
+
+function renderFC(){
+  if(!fcCards.length) return;
+  const c = fcCards[fcIdx % fcCards.length];
+  const total = fcCards.length;
+  const pct = Math.round((fcIdx / total)*100);
+
+  document.getElementById('fcProgressTxt').innerHTML = `Картка <span>${fcIdx+1}</span> з <span>${total}</span> · Знаю: <span style="color:var(--green)">${fcKnown}</span>`;
+  document.getElementById('fcProgBar').style.width = pct + '%';
+
+  document.getElementById('fc-emoji').textContent = c.e;
+  document.getElementById('fc-main').textContent = c.w;
+  document.getElementById('fc-sub').textContent = 'Це що? Натисни щоб дізнатися';
+  document.getElementById('fc-back-main').textContent = c.w;
+  document.getElementById('fc-back-syl').textContent = c.s;
+
+  const fc = document.getElementById('flashcard');
+  fc.classList.remove('flipped');
+  fcFlipped = false;
+}
+
+function flipCard(){
+  const fc = document.getElementById('flashcard');
+  fcFlipped = !fcFlipped;
+  fc.classList.toggle('flipped', fcFlipped);
+  if(fcFlipped) speak(fcCards[fcIdx % fcCards.length].w);
+}
+
+function fcSpeak(){
+  if(fcCards.length) speak(fcCards[fcIdx % fcCards.length].w);
+}
+
+function fcAnswer(known){
+  if(known){
+    fcKnown++;
+    addXP(5,'🃏');
+    markWordDone(fcCards[fcIdx % fcCards.length].w);
+  }
+  fcIdx++;
+  if(fcIdx >= fcCards.length){
+    showToast(`🃏 Набір завершено! ${fcKnown}/${fcCards.length} знаєш!`);
+    if(fcKnown === fcCards.length) triggerConfetti();
+    fcIdx = 0; fcKnown = 0;
+  }
+  renderFC();
+}
+
+/* ============================================================
+   QUIZ ENGINE
+   ============================================================ */
+let QZ = {type:'mixed', questions:[], cur:0, score:0, lives:3, ok:0, bad:0};
+
+function startQuiz(type){
+  QZ.type = type;
+  QZ.questions = buildQuestions(type, 15);
+  QZ.cur = 0; QZ.score = 0; QZ.lives = 3; QZ.ok = 0; QZ.bad = 0;
+  goPage('quiz');
+  renderQuizQ();
+}
+
+function buildQuestions(type, n){
+  const qs = [];
+
+  if(type === 'letters' || type === 'mixed'){
+    ALPHABET.forEach(a => {
+      const opts = genOpts4(a.l);
+      qs.push({kind:'letter', display:a.n, correct:a.l, options:opts, q:'Яка це буква?'});
+    });
+    ALPHABET.forEach(a => {
+      const wrongLetters = ALPHABET.filter(x => x.l !== a.l).sort(() => .5-Math.random()).slice(0,3).map(x => x.n);
+      qs.push({kind:'letter_name', display:a.l, correct:a.n, options:[...wrongLetters, a.n].sort(() => .5-Math.random()), q:'Як називається ця буква?', optStyle:'small'});
+    });
+  }
+
+  if(type === 'words' || type === 'mixed'){
+    ALL_WORDS.forEach(w => {
+      const wrongWords = ALL_WORDS.filter(x => x.w !== w.w).sort(() => .5-Math.random()).slice(0,3).map(x => x.w);
+      qs.push({kind:'word_sound', display:w.w, correct:w.w, options:[...wrongWords, w.w].sort(() => .5-Math.random()), q:`Що ти чуєш?`, hint:'🔊 Натисни на слово щоб почути', playWord:w.w, optStyle:'word'});
+    });
+    ALL_WORDS.forEach(w => {
+      const wrongEmojis = ALL_WORDS.filter(x => x.w !== w.w).sort(() => .5-Math.random()).slice(0,3).map(x => x.e);
+      const opts4 = [...wrongEmojis, w.e].sort(() => .5-Math.random());
+      qs.push({kind:'emoji_match', display:w.w, correct:w.e, options:opts4, q:`Знайди правильну картинку`, emojiMode:true});
+    });
+  }
+
+  if(type === 'mixed'){
+    SYLLABLES.flatMap(g => g.items).forEach(syl => {
+      const wrongS = SYLLABLES.flatMap(g => g.items).filter(s => s !== syl).sort(() => .5-Math.random()).slice(0,3);
+      qs.push({kind:'syllable', display:syl, correct:syl, options:[...wrongS, syl].sort(() => .5-Math.random()), q:'Який це склад?'});
+    });
+  }
+
+  return qs.sort(() => .5-Math.random()).slice(0, n);
+}
+
+function renderQuizQ(){
+  if(QZ.cur >= QZ.questions.length || QZ.lives <= 0){
+    finishQuiz(); return;
+  }
+  const q = QZ.questions[QZ.cur];
+  const pct = Math.round((QZ.cur / QZ.questions.length)*100);
+
+  document.getElementById('qLives').textContent = '❤️'.repeat(Math.max(0,QZ.lives)) + '🖤'.repeat(3 - Math.max(0,QZ.lives));
+  document.getElementById('qScore').textContent = QZ.score;
+  document.getElementById('qProgFill').style.width = pct + '%';
+
+  if(q.playWord) speak(q.playWord);
+  else if(q.kind === 'syllable') speak(q.display);
+  else if(q.kind === 'letter') speak(q.display);
+
+  const optClass = q.optStyle === 'word' ? 'quiz-opt quiz-opt-word' : q.emojiMode ? 'quiz-opt' : 'quiz-opt';
+
+  document.getElementById('quizInner').innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-type-tag">${QZ.cur+1} / ${QZ.questions.length}</div>
+      <div class="quiz-display ${q.kind.includes('word') && !q.emojiMode ? 'word-mode':''}"
+           onclick="speak('${q.playWord || q.display}')">${q.display}</div>
+      <div class="quiz-q-txt">${q.q}</div>
+      ${q.hint ? `<div class="quiz-hint">${q.hint}</div>` : ''}
+    </div>
+    <div class="quiz-opts-grid">
+      ${q.options.map(o => `
+        <div class="${optClass}" onclick="checkQZ(this,'${o.replace(/'/g,"\\'")}','${q.correct.replace(/'/g,"\\'")}')">
+          ${o}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function checkQZ(el, chosen, correct){
+  document.querySelectorAll('.quiz-opt').forEach(o => o.classList.add('dis'));
+  if(chosen === correct){
+    el.classList.add('ok');
+    QZ.score += 10; QZ.ok++;
+    addXP(10,'⚡');
+    speak(chosen);
+    setTimeout(nextQZ, 1400);
+  } else {
+    el.classList.add('no');
+    document.querySelectorAll('.quiz-opt').forEach(o => {
+      if(o.textContent.trim() === correct) o.classList.add('ok');
+    });
+    QZ.lives--; QZ.bad++;
+    speak('Ні');
+    setTimeout(nextQZ, 1600);
+  }
+  document.getElementById('qLives').textContent = '❤️'.repeat(Math.max(0,QZ.lives)) + '🖤'.repeat(3-Math.max(0,QZ.lives));
+}
+function nextQZ(){ QZ.cur++; renderQuizQ(); }
+
+function finishQuiz(){
+  S.totalQuizzes++;
+  S.streak++;
+  if(QZ.score > S.quizBest) S.quizBest = QZ.score;
+  saveS(); updateUI(); checkAchievements();
+
+  const acc = (QZ.ok + QZ.bad) > 0 ? Math.round((QZ.ok/(QZ.ok+QZ.bad))*100) : 0;
+  if(acc >= 70) triggerConfetti();
+
+  const emo = acc >= 80 ? '🏆' : acc >= 60 ? '💪' : '😤';
+  const ttl = acc >= 80 ? 'Легенда!' : acc >= 60 ? 'Непогано!' : 'Тренуйся!';
+  const msg = acc >= 80 ? 'Ти справжній чемпіон! 🏎️' : acc >= 60 ? 'Ще трохи і ти топ!' : 'Ніхто не здається. Ще раз!';
+
+  speak(acc >= 70 ? 'Молодець!' : 'Спробуй ще раз');
+
+  document.getElementById('quizResultInner').innerHTML = `
+    <div class="result-hero">
+      <div class="result-emo">${emo}</div>
+      <div class="result-ttl">${ttl}</div>
+      <div class="result-sub">${msg}</div>
+      <div class="result-stats-row">
+        <div class="rs-box"><div class="rs-val g">${QZ.ok}</div><div class="rs-lbl">Правильно</div></div>
+        <div class="rs-box"><div class="rs-val a">${QZ.score}</div><div class="rs-lbl">Очки</div></div>
+        <div class="rs-box"><div class="rs-val b">${acc}%</div><div class="rs-lbl">Точність</div></div>
+      </div>
+    </div>
+    <button class="btn-full" onclick="startQuiz('${QZ.type}')">🔄 Ще раз!</button>
+    <button class="btn-full outline" onclick="goPage('quiz-select')">← Вибрати інший</button>
+    <button class="btn-full outline" onclick="goPage('home')">🏠 Головна</button>
+  `;
+  goPage('quiz-result');
+}
+
+/* ============================================================
+   GAMES
+   ============================================================ */
+let gameState = {};
+let gameTimer = null;
+
+function startGame(type){
+  clearInterval(gameTimer);
+  if(type === 'match') initMatchGame();
+  else if(type === 'fib') initFIBGame();
+  else if(type === 'sound') initSoundGame();
+  goPage('game-board');
+}
+
+/* --- MATCH GAME --- */
+function initMatchGame(){
+  S.totalGames++;
+  const pool = ALL_WORDS.sort(() => .5-Math.random()).slice(0, 6);
+  gameState = {type:'match', pairs: pool, leftSelected: null, matchedPairs:[], wrongFlash:false, score:0, time:60, shuffledRight:null};
+
+  renderMatchGame();
+  gameTimer = setInterval(() => {
+    gameState.time--;
+    const el = document.getElementById('gameTimer');
+    if(el) el.textContent = gameState.time + 's';
+    if(el && gameState.time <= 10) el.classList.add('warn');
+    if(gameState.time <= 0){
+      clearInterval(gameTimer);
+      endGame(gameState.score, 'Час вийшов!');
+    }
+  }, 1000);
+}
+
+function renderMatchGame(){
+  const {pairs, matchedPairs, score, time} = gameState;
+  const leftItems = pairs.map(p => p.w);
+  const rightItems = pairs.map(p => p.e);
+  // Store shuffled order once so matchSelectRight can use inline emoji values (no rightMap needed)
+  if(!gameState.shuffledRight){
+    gameState.shuffledRight = [...rightItems].sort(() => .5-Math.random());
+  }
+  const shuffledRight = gameState.shuffledRight;
+
+  document.getElementById('gameBoardInner').innerHTML = `
+    <div class="game-card">
+      <div class="game-title-bar">
+        <div class="game-name">🔗 З'єднай слово з емодзі</div>
+        <div class="game-timer" id="gameTimer">${time}s</div>
+      </div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px">
+        Натисни слово зліва, потім відповідну картинку справа
+      </div>
+      <div class="match-pairs">
+        <div class="match-col" id="matchLeft">
+          ${leftItems.map((w, i) => {
+            const done = matchedPairs.some(m => m.w === w);
+            return `<div class="match-cell ${done?'matched':''}" id="ml-${i}" onclick="matchSelectLeft(${i},'${w}')">${w}</div>`;
+          }).join('')}
+        </div>
+        <div class="match-col" id="matchRight">
+          ${shuffledRight.map((e, i) => {
+            const done = matchedPairs.some(m => m.e === e);
+            return `<div class="match-cell emoji-cell ${done?'matched':''}" id="mr-${i}" onclick="matchSelectRight(${i},'${e}')">${e}</div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:14px;font-family:'Unbounded';font-weight:700;font-size:18px;color:var(--accent)">
+        Очки: ${score}
+      </div>
+    </div>
+  `;
+}
+
+function matchSelectLeft(idx, word){
+  const el = document.getElementById('ml-' + idx);
+  if(el.classList.contains('matched')) return;
+  document.querySelectorAll('#matchLeft .match-cell.selected').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  gameState.leftSelected = {idx, word};
+  // find pair emoji
+  gameState.leftSelectedEmoji = gameState.pairs.find(p => p.w === word)?.e;
+}
+
+function matchSelectRight(idx, emoji){
+  if(!gameState.leftSelected) return;
+  const el = document.getElementById('mr-' + idx);
+  if(el.classList.contains('matched')) return;
+  const leftEl = document.getElementById('ml-' + gameState.leftSelected.idx);
+
+  if(emoji === gameState.leftSelectedEmoji){
+    leftEl.classList.remove('selected');
+    leftEl.classList.add('matched');
+    el.classList.add('matched');
+    gameState.matchedPairs.push({w: gameState.leftSelected.word, e: emoji});
+    gameState.score += 20;
+    gameState.leftSelected = null;
+    addXP(20,'🔗');
+    speak('Правильно');
+    // Update score display
+    const scoreEl = document.querySelector('#gameBoardInner [style*="Очки"]');
+    if(scoreEl) scoreEl.textContent = 'Очки: ' + gameState.score;
+    if(gameState.matchedPairs.length === gameState.pairs.length){
+      clearInterval(gameTimer);
+      setTimeout(() => endGame(gameState.score, ''), 1200);
+    }
+  } else {
+    leftEl.classList.add('wrong-shake');
+    el.classList.add('wrong-shake');
+    speak('Ні');
+    setTimeout(() => {
+      leftEl.classList.remove('wrong-shake','selected');
+      el.classList.remove('wrong-shake');
+      gameState.leftSelected = null;
+    }, 400);
+  }
+}
+
+/* --- FILL IN BLANK GAME --- */
+function initFIBGame(){
+  S.totalGames++;
+  const pool = ALL_WORDS.sort(() => .5-Math.random()).slice(0, 10);
+  gameState = {type:'fib', pool, cur:0, score:0, lives:3};
+  renderFIBQ();
+}
+
+function renderFIBQ(){
+  const {pool, cur, score, lives} = gameState;
+  if(cur >= pool.length || lives <= 0){ clearInterval(gameTimer); endGame(score, ''); return; }
+  const word = pool[cur];
+  const blankIdx = Math.floor(Math.random() * word.w.length);
+  const blankChar = word.w[blankIdx];
+  gameState.blankIdx = blankIdx;
+  gameState.blankChar = blankChar;
+  gameState.currentWord = word;
+
+  const displayed = word.w.split('').map((c, i) =>
+    i === blankIdx ? `<span class="blank">_</span>` : c
+  ).join('');
+
+  // wrong letter options
+  const wrongChars = ALPHABET.map(a => a.l).filter(l => l !== blankChar).sort(() => .5-Math.random()).slice(0, 5);
+  const letterOpts = [...wrongChars, blankChar].sort(() => .5-Math.random());
+
+  speak(word.w);
+
+  document.getElementById('gameBoardInner').innerHTML = `
+    <div class="game-card">
+      <div class="game-title-bar">
+        <div class="game-name">❓ Заповни букву</div>
+        <div style="font-family:'Unbounded';font-weight:700;color:var(--accent)">❤️ ${lives}</div>
+      </div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px">
+        ${word.e} Слово: яка пропущена буква? (${cur+1}/${pool.length})
+      </div>
+      <div class="fib-word-display">${displayed}</div>
+      <div class="fib-letters">
+        ${letterOpts.map(l => `<div class="fib-letter" onclick="checkFIB(this,'${l}')">${l}</div>`).join('')}
+      </div>
+      <div style="text-align:center;font-family:'Unbounded';font-weight:700;font-size:18px;color:var(--accent)">
+        Очки: ${score}
+      </div>
+    </div>
+  `;
+}
+
+function checkFIB(el, chosen){
+  document.querySelectorAll('.fib-letter').forEach(l => l.style.pointerEvents = 'none');
+  if(chosen === gameState.blankChar){
+    el.classList.add('right-l');
+    gameState.score += 15;
+    addXP(15,'❓');
+    // Show the correct letter filling the blank
+    const blankEl = document.querySelector('.fib-word-display .blank');
+    if(blankEl){
+      blankEl.textContent = chosen;
+      blankEl.style.color = 'var(--green)';
+      blankEl.style.borderBottomColor = 'var(--green)';
+    }
+    speak(gameState.currentWord.w);
+    setTimeout(() => { gameState.cur++; renderFIBQ(); }, 1400);
+  } else {
+    el.classList.add('wrong-l');
+    gameState.lives--;
+    speak('Ні');
+    setTimeout(() => {
+      document.querySelectorAll('.fib-letter').forEach(l => {
+        l.style.pointerEvents = '';
+        l.classList.remove('wrong-l');
+      });
+      if(gameState.lives <= 0) endGame(gameState.score, '');
+    }, 600);
+  }
+}
+
+/* --- SOUND CHALLENGE --- */
+function initSoundGame(){
+  S.totalGames++;
+  const pool = ALL_WORDS.sort(() => .5-Math.random()).slice(0, 10);
+  gameState = {type:'sound', pool, cur:0, score:0, lives:3};
+  renderSoundQ();
+}
+
+function renderSoundQ(){
+  const {pool, cur, score, lives} = gameState;
+  if(cur >= pool.length || lives <= 0){ endGame(score, ''); return; }
+  const word = pool[cur];
+  const wrongs = pool.filter(w => w.w !== word.w).sort(() => .5-Math.random()).slice(0,3);
+  const opts = [...wrongs, word].sort(() => .5-Math.random());
+
+  speak(word.w);
+  gameState.currentWord = word;
+
+  document.getElementById('gameBoardInner').innerHTML = `
+    <div class="game-card">
+      <div class="game-title-bar">
+        <div class="game-name">🔊 Звуковий челендж</div>
+        <div style="font-family:'Unbounded';font-weight:700;color:var(--accent)">❤️ ${lives}</div>
+      </div>
+      <div class="sound-challenge">
+        <span class="sc-emoji" onclick="speak('${word.w}')" style="cursor:pointer">${word.e}</span>
+        <button class="btn-speak" onclick="speak('${word.w}')" style="margin:0 auto 20px;display:inline-flex">
+          🔊 Почути ще раз
+        </button>
+        <div class="sc-question">Яке слово ти чуєш? (${cur+1}/${pool.length})</div>
+        <div class="sc-opts">
+          ${opts.map(o => `<div class="sc-opt" onclick="checkSound(this,'${o.w}','${word.w}')">${o.w}</div>`).join('')}
+        </div>
+      </div>
+      <div style="text-align:center;font-family:'Unbounded';font-weight:700;font-size:18px;color:var(--accent);margin-top:12px">
+        Очки: ${score}
+      </div>
+    </div>
+  `;
+}
+
+function checkSound(el, chosen, correct){
+  document.querySelectorAll('.sc-opt').forEach(o => o.style.pointerEvents = 'none');
+  if(chosen === correct){
+    el.classList.add('ok');
+    gameState.score += 15;
+    addXP(15,'🔊');
+    speak(correct);
+    setTimeout(() => { gameState.cur++; renderSoundQ(); }, 1500);
+  } else {
+    el.classList.add('no');
+    document.querySelectorAll('.sc-opt').forEach(o => { if(o.textContent.trim() === correct) o.classList.add('ok'); });
+    gameState.lives--;
+    speak('Ні');
+    setTimeout(() => {
+      if(gameState.lives <= 0){ endGame(gameState.score,''); return; }
+      gameState.cur++;
+      renderSoundQ();
+    }, 1200);
+  }
+}
+
+function endGame(score, extra){
+  S.totalGames++;
+  saveS(); updateUI(); checkAchievements();
+  if(score >= 60) triggerConfetti();
+  speak(score >= 60 ? 'Молодець!' : 'Спробуй ще раз');
+
+  document.getElementById('gameResultInner').innerHTML = `
+    <div class="result-hero">
+      <div class="result-emo">${score >= 80 ? '🏆' : score >= 40 ? '💪' : '😤'}</div>
+      <div class="result-ttl">${score >= 80 ? 'Відмінно!' : score >= 40 ? 'Непогано!' : 'Тренуйся!'}</div>
+      <div class="result-sub">Ти набрав ${score} очок!</div>
+    </div>
+    <button class="btn-full" onclick="goPage('games')">🔄 Ще раз</button>
+    <button class="btn-full outline" onclick="goPage('home')">🏠 Головна</button>
+  `;
+  goPage('game-result');
+}
+
+/* ============================================================
+   PARENT MODE
+   ============================================================ */
+
+const MISSIONS = [
+  // EASY
+  {id:'m_learn5letters',lvl:'easy',ico:'🔤',name:'Вивчи 5 букв',desc:'Відкрий і прослухай 5 різних букв алфавіту',xp:30,action:()=>goPage('letters'),check:s=>s.learnedLetters.length>=5},
+  {id:'m_learn10syl',lvl:'easy',ico:'📖',name:'10 складів',desc:'Натисни і прослухай 10 складів',xp:30,action:()=>goPage('syllables'),check:s=>s.learnedSyllables.length>=10},
+  {id:'m_learn5words',lvl:'easy',ico:'🚗',name:'Познайом з 5 словами',desc:'Відмеч 5 слів як вивчені в розділі Слова',xp:40,action:()=>goPage('words'),check:s=>s.learnedWords.length>=5},
+  {id:'m_quiz1',lvl:'easy',ico:'⚡',name:'Перший квіз',desc:'Пройди будь-який квіз до кінця',xp:50,action:()=>goPage('quiz-select'),check:s=>s.totalQuizzes>=1},
+  {id:'m_game1',lvl:'easy',ico:'🎮',name:'Перша гра',desc:'Зіграй в будь-яку гру',xp:50,action:()=>goPage('games'),check:s=>s.totalGames>=1},
+  {id:'m_fc1',lvl:'easy',ico:'🃏',name:'Перші флешкарти',desc:'Переглянь 5 флешкарт і натисни "Знаю!"',xp:30,action:()=>goPage('flashcards'),check:s=>s.learnedWords.length>=3},
+
+  // MEDIUM
+  {id:'m_learn15letters',lvl:'medium',ico:'🔡',name:'15 букв алфавіту',desc:'Продовжуй вивчати — відкрий 15 букв',xp:60,action:()=>goPage('letters'),check:s=>s.learnedLetters.length>=15},
+  {id:'m_learn30syl',lvl:'medium',ico:'📚',name:'30 складів',desc:'Прослухай 30 складів — це вже серйозно!',xp:60,action:()=>goPage('syllables'),check:s=>s.learnedSyllables.length>=30},
+  {id:'m_learn15words',lvl:'medium',ico:'🏎️',name:'15 слів',desc:'Вивчи 15 слів зі свого улюбленого розділу',xp:80,action:()=>goPage('words'),check:s=>s.learnedWords.length>=15},
+  {id:'m_quiz3',lvl:'medium',ico:'🎯',name:'3 квізи',desc:'Пройди 3 квізи — тренуйся регулярно!',xp:80,action:()=>goPage('quiz-select'),check:s=>s.totalQuizzes>=3},
+  {id:'m_match_win',lvl:'medium',ico:'🔗',name:'Матч-гра: перемога!',desc:'Виграй матч-гру набравши 100+ очок',xp:70,action:()=>startGame('match'),check:s=>s.xp>=200},
+  {id:'m_xp200',lvl:'medium',ico:'💯',name:'200 XP',desc:'Набери 200 XP загалом',xp:0,action:null,check:s=>s.xp>=200},
+  {id:'m_sound5',lvl:'medium',ico:'🔊',name:'Звуковий челендж',desc:'Зіграй в "Звуковий челендж" 2 рази',xp:60,action:()=>startGame('sound'),check:s=>s.totalGames>=5},
+
+  // HARD
+  {id:'m_half_alpha',lvl:'hard',ico:'⭐',name:'Половина алфавіту',desc:'Вивчи 17 або більше букв — ти вже на половині!',xp:100,action:()=>goPage('letters'),check:s=>s.learnedLetters.length>=17},
+  {id:'m_learn30words',lvl:'hard',ico:'🌟',name:'30 слів',desc:'Ціль — 30 слів. Ти можеш це!',xp:120,action:()=>goPage('words'),check:s=>s.learnedWords.length>=30},
+  {id:'m_xp500',lvl:'hard',ico:'🚀',name:'500 XP',desc:'Досягни 500 XP! Ти стаєш легендою.',xp:0,action:null,check:s=>s.xp>=500},
+  {id:'m_quiz10',lvl:'hard',ico:'🏆',name:'10 квізів',desc:'Пройди 10 квізів — справжній марафон!',xp:150,action:()=>goPage('quiz-select'),check:s=>s.totalQuizzes>=10},
+  {id:'m_all_syl',lvl:'hard',ico:'📖',name:'80 складів',desc:'Вивчи 80 складів — майже всі!',xp:120,action:()=>goPage('syllables'),check:s=>s.learnedSyllables.length>=80},
+
+  // EPIC
+  {id:'m_full_alpha',lvl:'epic',ico:'🏆',name:'Весь алфавіт!',desc:'Вивчи усі 33 букви. Легенда!',xp:200,action:()=>goPage('letters'),check:s=>s.learnedLetters.length>=33},
+  {id:'m_learn50words',lvl:'epic',ico:'👑',name:'50 слів — Чемпіон!',desc:'50 вивчених слів. Ти справжній знавець мови!',xp:250,action:()=>goPage('words'),check:s=>s.learnedWords.length>=50},
+  {id:'m_xp1000',lvl:'epic',ico:'💎',name:'1000 XP — Легенда',desc:'Набери 1000 XP. Вищий рівень!',xp:0,action:null,check:s=>s.xp>=1000},
+  {id:'m_streak7',lvl:'epic',ico:'🔥',name:'Тиждень поспіль',desc:'Займайся 7 днів поспіль',xp:200,action:null,check:s=>s.streak>=7},
+];
+
+let parentTab = 'stats';
+
+function switchParentTab(tab, el){
+  parentTab = tab;
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('parentPanelStats').style.display = tab==='stats'?'':'none';
+  document.getElementById('parentPanelMissions').style.display = tab==='missions'?'':'none';
+  document.getElementById('parentPanelAchievements').style.display = tab==='achievements'?'':'none';
+  if(tab==='missions') renderMissions();
+  if(tab==='achievements') renderParentAch();
+}
+
+function renderMissions(){
+  // Count how many are done
+  const doneCnt = MISSIONS.filter(m=>m.check(S)).length;
+  document.getElementById('missionsList').innerHTML = MISSIONS.map((m, idx) => {
+    const done = m.check(S);
+    // Unlock logic: each hard mission needs 3+ mediums done, epic needs 2+ hards done
+    const easyDone = MISSIONS.filter(x=>x.lvl==='easy'&&x.check(S)).length;
+    const medDone = MISSIONS.filter(x=>x.lvl==='medium'&&x.check(S)).length;
+    const hardDone = MISSIONS.filter(x=>x.lvl==='hard'&&x.check(S)).length;
+    let locked = false;
+    if(m.lvl==='medium' && easyDone < 2) locked = true;
+    if(m.lvl==='hard' && medDone < 3) locked = true;
+    if(m.lvl==='epic' && hardDone < 2) locked = true;
+
+    const lvlLabel = {easy:'ЛЕГКО',medium:'СЕРЕДНІЙ',hard:'ВАЖКО',epic:'ЕПІЧНО'}[m.lvl];
+    const cls = done ? 'done' : locked ? 'locked' : 'active-m';
+    const canClick = !done && !locked && m.action;
+
+    return `<div class="mission-card ${cls}" onclick="${canClick?'doMission('+idx+')':''}">
+      <div class="mission-ico">${m.ico}</div>
+      <div class="mission-info">
+        <span class="mission-lvl-badge ${m.lvl}">${lvlLabel}</span>
+        <div class="mission-name">${m.name}</div>
+        <div class="mission-desc">${m.desc}</div>
+        ${m.xp>0?`<div style="margin-top:5px;font-size:11px;color:var(--accent2);font-weight:700">+${m.xp} XP за виконання</div>`:''}
+      </div>
+      <div class="mission-done-badge">${done?'✅':locked?'🔒':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function doMission(idx){
+  const m = MISSIONS[idx];
+  if(!m || !m.action) return;
+  // Award XP if just completed
+  closeSidebar();
+  m.action();
+  showToast('🎯 Завдання розпочато!');
+}
+
+function checkMissionCompletion(){
+  MISSIONS.forEach(m => {
+    const key = 'missionDone_' + m.id;
+    if(m.check(S) && !S[key] && m.xp > 0){
+      S[key] = true;
+      addXP(m.xp, '🎯');
+      showToast('🎯 Завдання виконано! +' + m.xp + ' XP');
+      triggerConfetti();
+      saveS();
+    }
+  });
+}
+
+function renderParent(){
+  const totalW = ALL_WORDS.length;
+  const lPct = Math.round((S.learnedLetters.length / ALPHABET.length)*100);
+  const sPct = Math.round((S.learnedSyllables.length / 120)*100);
+  const wPct = Math.round((S.learnedWords.length / totalW)*100);
+
+  document.getElementById('parentStats').innerHTML = `
+    <div class="pstat"><div class="pstat-val a">${S.xp}</div><div class="pstat-lbl">Загальний XP</div></div>
+    <div class="pstat"><div class="pstat-val b">${S.totalQuizzes}</div><div class="pstat-lbl">Квізів</div></div>
+    <div class="pstat"><div class="pstat-val g">${S.totalGames}</div><div class="pstat-lbl">Ігор</div></div>
+    <div class="pstat"><div class="pstat-val p">${S.streak}</div><div class="pstat-lbl">Серія днів</div></div>
+  `;
+
+  document.getElementById('parentProgress').innerHTML = `
+    <div class="parent-progress-item">
+      <div class="ppi-label">🔤 Букви</div>
+      <div class="ppi-bar"><div class="ppi-fill" style="width:${lPct}%;background:var(--accent)"></div></div>
+      <div class="ppi-pct">${lPct}%</div>
+    </div>
+    <div class="parent-progress-item">
+      <div class="ppi-label">📖 Склади</div>
+      <div class="ppi-bar"><div class="ppi-fill" style="width:${sPct}%;background:var(--blue)"></div></div>
+      <div class="ppi-pct">${sPct}%</div>
+    </div>
+    <div class="parent-progress-item">
+      <div class="ppi-label">🚗 Слова</div>
+      <div class="ppi-bar"><div class="ppi-fill" style="width:${wPct}%;background:var(--green)"></div></div>
+      <div class="ppi-pct">${wPct}%</div>
+    </div>
+    <div style="margin-top:10px;text-align:center;font-size:12px;color:var(--text2)">
+      Завдань виконано: <strong style="color:var(--accent)">${MISSIONS.filter(m=>m.check(S)).length}</strong> / ${MISSIONS.length}
+    </div>
+  `;
+}
+
+function renderParentAch(){
+  document.getElementById('parentAch').innerHTML = ACHIEVEMENTS.map(a => {
+    const earned = a.check(S);
+    return `<div class="ach-row ${!earned?'ach-locked2':''}">
+      <div class="ach-ico2">${a.ico}</div>
+      <div class="ach-info2">
+        <div class="ach-nm2">${a.name}</div>
+        <div class="ach-desc2">${a.desc}</div>
+      </div>
+      ${earned ? '<div class="ach-done">✅</div>' : '<div style="color:var(--text3);font-size:16px">🔒</div>'}
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   ACHIEVEMENTS
+   ============================================================ */
+function renderAchievements(){
+  document.getElementById('achList').innerHTML = ACHIEVEMENTS.map(a => {
+    const earned = a.check(S);
+    return `<div class="ach-row ${!earned?'ach-locked2':''}">
+      <div class="ach-ico2">${a.ico}</div>
+      <div class="ach-info2">
+        <div class="ach-nm2">${a.name}</div>
+        <div class="ach-desc2">${a.desc}</div>
+      </div>
+      ${earned ? '<div class="ach-done">✅</div>' : '<div style="color:var(--text3);font-size:16px">🔒</div>'}
+    </div>`;
+  }).join('');
+}
+
+function checkAchievements(){
+  // could show toast for new achievements
+  checkMissionCompletion();
+  saveS();
+}
+
+/* ============================================================
+   CONFETTI
+   ============================================================ */
+function triggerConfetti(){
+  const layer = document.getElementById('confettiLayer');
+  const colors = ['#ff5e14','#ff8c00','#38b2ff','#26e07a','#ffd233','#ff4545','#b06bff'];
+  for(let i = 0; i < 70; i++){
+    const p = document.createElement('div');
+    p.className = 'cp';
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDuration = (1.5 + Math.random()*2) + 's';
+    p.style.animationDelay = Math.random()*.6 + 's';
+    layer.appendChild(p);
+    setTimeout(() => p.remove(), 4000);
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+loadS();
+applyTheme();
+updateUI();
+
+// Restore last page
+const lastP = S.lastPage || 'home';
+goPage(lastP);
+</script>
+</body>
+</html>
